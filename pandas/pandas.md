@@ -1,10 +1,15 @@
-* Frequently used options when using pandas
+### Frequently used options when using pandas
 ```python
 pd.set_option('max_rows', 7)
 pd.reset_option('max_rows')
-
 ```
-* Set display precision of numerical number with pandas
+### Display rows for a DataFrame
+```
+pd.set_option('display.max_rows', 1000)
+display(df)
+```
+
+### Set display precision of numerical number with pandas
   * [temporaly set display precision](https://stackoverflow.com/questions/36909368/precision-lost-while-using-read-csv-in-pandas)
   ```python
   with pd.option_context('display.precision', 10):
