@@ -1,4 +1,4 @@
-### [Avoid Chained Indexing and prefer .loc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
+### [Avoid Chained Indexing and prefer .loc/.iloc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
 
 Suppose we have following data
 ```
@@ -17,7 +17,7 @@ dfmi = pd.DataFrame([list('abcd'),
 3     m      n     o      p
 ```
 
-This is so called 'chained indexing'
+This is so called **'chained indexing'**
 ```
 dfmi['one']['second']
 ```
