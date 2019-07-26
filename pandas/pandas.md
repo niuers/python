@@ -2,16 +2,13 @@
 
 Suppose we have following data
 ```
-In [338]: dfmi = pd.DataFrame([list('abcd'),
-   .....:                      list('efgh'),
-   .....:                      list('ijkl'),
-   .....:                      list('mnop')],
-   .....:                     columns=pd.MultiIndex.from_product([['one', 'two'],
-   .....:                                                         ['first', 'second']]))
-   .....: 
+dfmi = pd.DataFrame([list('abcd'),
+                     list('efgh'),
+                     list('ijkl'),
+                     list('mnop')],
+                     columns=pd.MultiIndex.from_product([['one', 'two'],
+                                                         ['first', 'second']]))
 
-In [339]: dfmi
-Out[339]: 
     one          two       
   first second first second
 0     a      b     c      d
