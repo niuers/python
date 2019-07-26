@@ -1,4 +1,4 @@
-### [Avoid Chained Indexing, prefer .loc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
+### [Avoid Chained Indexing and prefer .loc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
 
 Suppose we have following data
 ```
