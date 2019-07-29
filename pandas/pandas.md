@@ -1,3 +1,11 @@
+## Basic Data Structures
+### np.array/np.ndarray
+
+### pd.Series
+
+### pd.DataFrame
+
+
 ### [Avoid Chained Indexing and prefer .loc/.iloc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
 #### What is Chained Indexing?
 
