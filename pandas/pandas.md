@@ -1,9 +1,67 @@
+### Table of Contents
+
+
 ## Basic Data Structures
 ### np.array/np.ndarray
 
 ### pd.Series
 
 ### pd.DataFrame
+
+### [Avoid Using Apply Function](https://stackoverflow.com/questions/54432583/when-should-i-ever-want-to-use-pandas-apply-in-my-code)
+
+#### What `apply` does?
+* `DataFrame.apply` and `Series.apply` are convenience functions defined on `DataFrame` and `Series` object respectively.
+* `pd.Series.apply` is a Python-level row-wise loop, ditto `pd.DataFrame.apply` row-wise (axis=1).
+* There are very few situations where apply is appropriate to use . If you're not sure whether you should be using apply, you probably shouldn't.
+
+#### Why is apply bad? 
+* **It is because `apply` is slow**. `Pandas` makes no assumptions about the nature of your function, and so iteratively applies your function to each row/column as necessary. 
+* Additionally, `apply` can handle so many situations means `apply` incurs some major overhead at each iteration. 
+* Further, apply consumes a lot more memory, which is a challenge for memory bounded applications.
+
+
+#### How to make code `apply` free?
+* Numerical Data
+  * Replace `apply` with **vectorized cython function**. e.g. use `df.sum()` instead of `df.apply(np.sum)`.
+* String/Regex
+  * Pandas provides "vectorized" string functions in most situations, but there are rare cases where those functions do not... "apply", so to speak.
+  * The thing to note here is that iterative routines(e.g. list comprehension) happen to be faster than apply, because of the lower overhead. If you need to handle NaNs and invalid dtypes, you can build on this using a custom function you can then call with arguments inside the list comprehension.
+
+#### A Common Pitfall: Exploding Columns of Lists
+```
+s = pd.Series([[1, 2]] * 3)
+s.apply(pd.Series) # Horrible in performance
+pd.DataFrame(s.tolist()) # Better
+```
+
+#### Are there any situations where apply is good?
+* Apply is a convenience function, so there are situations where the overhead is negligible enough to forgive. It really depends on how many times the function is called. If you are using `pd.DataFrame.apply` row-wise, specifying raw=True (where possible) is often beneficial. 
+
+* Functions that are Vectorized for Series, but not DataFrames
+  * What if you want to apply a string operation on multiple columns? What if you want to convert multiple columns to datetime? These functions are vectorized for Series only, so they must be applied over each column that you want to convert/operate on.
+  ```
+  %timeit df.apply(pd.to_datetime, errors='coerce')   #admissible
+  %timeit pd.to_datetime(df.stack(), errors='coerce').unstack()  #fine
+  %timeit pd.concat([pd.to_datetime(df[c], errors='coerce') for c in df], axis=1) #fine
+  %timeit for c in df.columns: df[c] = pd.to_datetime(df[c], errors='coerce') #fine
+
+  ```
+  * Note that it would also make sense to stack, or just use an explicit loop. All these options are slightly faster than using apply, but the difference is small enough to forgive.
+
+#### Converting Series to str: astype versus apply
+* Using apply to convert integers in a Series to string is comparable (and sometimes faster) than using astype.
+* With floats, I see the astype is consistently as fast as, or slightly faster than apply. So this has to do with the fact that the data in the test is integer type.
+
+#### GroupBy operations with chained transformations
+* GroupBy.apply is also an iterative convenience function to handle anything that the existing GroupBy functions do not.
+* But in general, `apply` is an acceptable solution if the goal is to reduce a `groupby` call (because `groupby` is also quite expensive).
+
+
+#### Other Caveats
+
+* It is also worth mentioning that apply operates on the first row (or column) twice. This is done to determine whether the function has any side effects. If not, apply may be able to use a fast-path for evaluating the result, else it falls back to a slow implementation.
+
 
 
 ### [Avoid Chained Indexing and prefer .loc/.iloc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
