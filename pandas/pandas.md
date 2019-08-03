@@ -1,7 +1,7 @@
 ### Table of Contents
 * [Basic Data Structures](#basic-data-structures)
 * [Avoid Using Apply Function](#avoid-using-apply-function)
-* [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-.loc/.iloc)
+* [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-lociloc)
 * [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
 
 ## Basic Data Structures
@@ -156,7 +156,7 @@ Pandas has the SettingWithCopyWarning because assigning to a copy of a slice is 
   ```
   * case 3
   ```
-  dfc.loc[0, 'A'] = 11 #Correct way to assign
+  dfc.loc[0, 'A'] = 11 # Correct way to assign
   ```
 
 ## Frequently used options when using pandas
