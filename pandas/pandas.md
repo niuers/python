@@ -1,5 +1,6 @@
 ### Table of Contents
 * [Basic Data Structures](#basic-data-structures)
+* [Use `loc` and `iloc` to Select Data](#)
 * [Avoid Using Apply Function](#avoid-using-apply-function)
 * [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-lociloc)
 * [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
@@ -10,6 +11,50 @@
 ### pd.Series
 
 ### pd.DataFrame
+
+## Use `loc` and `iloc` to Select Data
+
+* Example DataFrame
+```
+df = pd.DataFrame({'name':['a','b','c','d','e'], 'time':['Mon', 'Tue', 'Wed', 'Thur', 'Fri'],'value':[55,65,75,85,95]})
+df = df.set_index('time')
+print(df.head(10))
+
+     name  value
+time            
+Mon     a     55
+Tue     b     65
+Wed     c     75
+Thur    d     85
+Fri     e     95
+```
+* Select data with `loc`
+```
+# pattern
+# df.loc[rows, cols]
+df.loc['Mon', 'value']
+df.loc[['Mon','Wed'], 'value']
+df.loc['Mon':'Wed', 'value']
+df.loc[['Mon','Wed'], ['value', 'time']]
+df.loc['Mon':'Wed', :]
+df.loc[:, 'value']
+df.loc['Mon', 'time':'value']
+df.loc['Mon':'Wed':2, :] #with step 2
+
+# use slice
+rows = slice('Mon', 'Fri', 2)
+cols = ['time', 'value']
+#These two are equivalent
+df.loc[rows, cols]
+df.loc['Mon':'Fri':2, cols]
+```
+
+* Select data with `iloc`
+```
+df.iloc[0,2]
+df.iloc[1:3,:]
+```
+
 
 ## [Avoid Using Apply Function](https://stackoverflow.com/questions/54432583/when-should-i-ever-want-to-use-pandas-apply-in-my-code)
 
