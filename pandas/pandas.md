@@ -32,18 +32,18 @@ Fri     e     95
 ```
 # pattern
 # df.loc[rows, cols]
-df.loc['Mon', 'value']
-df.loc[['Mon','Wed'], 'value']
+df.loc['Mon', 'value'] # return <class 'numpy.int64'>
+df.loc[['Mon','Wed'], 'value'] # return <class 'pandas.core.series.Series'>
 df.loc['Mon':'Wed', 'value']
-df.loc[['Mon','Wed'], ['value', 'time']]
+df.loc[['Mon','Wed'], ['value', 'name']] # return <class 'pandas.core.frame.DataFrame'>
 df.loc['Mon':'Wed', :]
 df.loc[:, 'value']
-df.loc['Mon', 'time':'value']
+df.loc['Mon', 'name':'value'] #return <class 'pandas.core.series.Series'>
 df.loc['Mon':'Wed':2, :] #with step 2
 
 # use slice
 rows = slice('Mon', 'Wed', 2)
-cols = ['time', 'value']
+cols = ['name', 'value']
 #These two are equivalent
 df.loc[rows, cols]
 df.loc['Mon':'Wed':2, cols]
@@ -51,7 +51,7 @@ df.loc['Mon':'Wed':2, cols]
 
 * Select data with `iloc`
 ```
-df.iloc[0,2]
+df.iloc[0,1]
 df.iloc[1:3,:]
 ```
 
