@@ -1,5 +1,8 @@
 ### Table of Contents
-
+* [Basic Data Structures](#basic-data-structures)
+* [Avoid Using Apply Function](#avoid-using-apply-function)
+* [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-.loc/.iloc)
+* [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
 
 ## Basic Data Structures
 ### np.array/np.ndarray
@@ -8,7 +11,7 @@
 
 ### pd.DataFrame
 
-### [Avoid Using Apply Function](https://stackoverflow.com/questions/54432583/when-should-i-ever-want-to-use-pandas-apply-in-my-code)
+## [Avoid Using Apply Function](https://stackoverflow.com/questions/54432583/when-should-i-ever-want-to-use-pandas-apply-in-my-code)
 
 #### What `apply` does?
 * `DataFrame.apply` and `Series.apply` are convenience functions defined on `DataFrame` and `Series` object respectively.
@@ -64,7 +67,7 @@ pd.DataFrame(s.tolist()) # Better
 
 
 
-### [Avoid Chained Indexing and prefer .loc/.iloc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
+## [Avoid Chained Indexing and prefer .loc/.iloc](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html)
 #### What is Chained Indexing?
 
 Suppose we have following data
@@ -156,7 +159,7 @@ Pandas has the SettingWithCopyWarning because assigning to a copy of a slice is 
   dfc.loc[0, 'A'] = 11 #Correct way to assign
   ```
 
-### Frequently used options when using pandas
+## Frequently used options when using pandas
 ```python
 pd.set_option('max_rows', 7)
 pd.reset_option('max_rows')
