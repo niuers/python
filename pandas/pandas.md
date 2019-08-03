@@ -42,11 +42,11 @@ df.loc['Mon', 'time':'value']
 df.loc['Mon':'Wed':2, :] #with step 2
 
 # use slice
-rows = slice('Mon', 'Fri', 2)
+rows = slice('Mon', 'Wed', 2)
 cols = ['time', 'value']
 #These two are equivalent
 df.loc[rows, cols]
-df.loc['Mon':'Fri':2, cols]
+df.loc['Mon':'Wed':2, cols]
 ```
 
 * Select data with `iloc`
