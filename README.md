@@ -1,5 +1,5 @@
 # Table of Contents
-*[Python Characteristics](#python-characteristics)
+* [Python Characteristics](#python-characteristics)
 
 # Python Characteristics
 ### Interpreted rather than compiled
