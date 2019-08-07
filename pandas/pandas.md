@@ -208,11 +208,22 @@ Pandas has the SettingWithCopyWarning because assigning to a copy of a slice is 
   ```
 
 ## Create new columns in a DataFrame
-* Directly assign
+
+* Create one column
+```
+df['new_col1'] = ['a','b','c']
+df['new_col1'] = pd.Series(['a','b','c'])
+```
+
+* Create multiple columns at once
 
 ```
 df[['new_col1', 'new_col2']] = pd.DataFrame({'A':[1,2,3], 'B':[4,5,6]})
+df[['new_col1', 'new_col2']] = pd.DataFrame([[1,4], [2,5], [3,6]])
+
 ```
+
+
 
 ## Frequently used options when using pandas
 ```python
