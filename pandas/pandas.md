@@ -3,7 +3,7 @@
 * [Use `loc` and `iloc` to Select Data](#use-loc-and-iloc-to-select-data)
 * [Avoid Using Apply Function](#avoid-using-apply-function)
 * [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-lociloc)
-* [Create new columns in a DataFrame]*(create-new-columns-in-a-dataframe)
+* [Create new columns in a DataFrame](#create-new-columns-in-a-dataframe)
 * [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
 * [Split Column of lists into multiple columns](#split-column-of-lists-into-multiple-columns)
 
