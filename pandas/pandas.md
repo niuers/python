@@ -3,6 +3,7 @@
 * [Use `loc` and `iloc` to Select Data](#use-loc-and-iloc-to-select-data)
 * [Avoid Using Apply Function](#avoid-using-apply-function)
 * [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-lociloc)
+* [Create new columns in a DataFrame]*(create-new-columns-in-a-dataframe)
 * [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
 * [Split Column of lists into multiple columns](#split-column-of-lists-into-multiple-columns)
 
@@ -12,6 +13,7 @@
 ### pd.Series
 
 ### pd.DataFrame
+
 
 ## Use `loc` and `iloc` to Select Data
 
@@ -202,8 +204,15 @@ Pandas has the SettingWithCopyWarning because assigning to a copy of a slice is 
   ```
   * case 3
   ```
-  dfc.loc[0, 'A'] = 11 # Correct way to assign
+  dfc.loc[0, 'A'] = 11 # Correct way to assign. N.B. This can't be used to create a new column called 'A'
   ```
+
+## Create new columns in a DataFrame
+* Directly assign
+
+```
+df[['new_col1', 'new_col2']] = pd.DataFrame({'A':[1,2,3], 'B':[4,5,6]})
+```
 
 ## Frequently used options when using pandas
 ```python
