@@ -4,6 +4,7 @@
 * [Avoid Using Apply Function](#avoid-using-apply-function)
 * [Avoid Chained Indexing and prefer .loc/.iloc](#avoid-chained-indexing-and-prefer-lociloc)
 * [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
+* [Split Column of lists into multiple columns](#split-column-of-lists-into-multiple-columns)
 
 ## Basic Data Structures
 ### np.array/np.ndarray
@@ -226,3 +227,20 @@ display(df)
   pd.set_option('precision', 10)
   df.head()
   ```
+
+## [Split Column of lists into multiple columns](https://stackoverflow.com/questions/35491274/pandas-split-column-of-lists-into-multiple-columns)
+
+Suppose we have a DataFrame `df` with a column of lists:
+```
+       name
+0	[ab, 1]
+1	[cd, 2]
+2	[ef, 3]
+3	[gh, 4]
+4	[ij, 5]
+```
+To split the column `name` into two columns, and assign to the original DataFrame
+
+```
+df[['char_name', 'name_num']] = pd.DataFrame(df['name'].values.to_list())
+```
