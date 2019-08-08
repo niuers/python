@@ -20,6 +20,8 @@
   s = 'café'
   len(s) # returns 4, meaning 4 characters
   ```
+* 1 character != 1 byte  
+
 ## Characters
 
 #### The Identity of Characters and Specific Byte Representations
@@ -77,6 +79,7 @@
 * UTF-8 is the default source encoding for Python 3, just as ASCII was the default for Python 2 (starting with 2.5). If you load a .py module containing non-UTF-8 data and no encoding declaration, you get a `SyntaxError`.
 
 * HOW TO DISCOVER THE ENCODING OF A BYTE SEQUENCE? Use package `chardetect`
+* We then considered the theory and practice of encoding detection in the absence of metadata: in theory, it can’t be done, but in practice the Chardet package pulls it off pretty well for a number of popular encodings
 
 #### Byte Order Mark (BOM)
 * Although binary sequences of encoded text usually don’t carry explicit hints of their encoding, the UTF formats may prepend a **byte order mark** to the textual content. 
@@ -118,8 +121,51 @@ On a big-endian CPU, the encoding would be reversed; 'E' would be encoded as 0 a
   * The character U+FEFF encoded in UTF-8 is the three-byte sequence b'\xef\xbb\xbf'. So if a file starts with those three bytes, it is likely to be a UTF-8 file with a BOM. However, Python does not automatically assume a file is UTF-8 just because it starts with b'\xef\xbb\xbf'.
 
 
+### The Unicode Sandwich
+* The best practice for handling text is the “Unicode sandwich”. 
+  * This means that bytes should be decoded to str as early as possible on input (e.g., when opening a file for reading). The “meat” of the sandwich is the business logic of your program, where text handling is done exclusively on str objects. You should never be encoding or decoding in the middle of other processing. On output, the str are encoded to bytes as late as possible.
+  * Always are explicit about the encodings in your programs, you will avoid a lot of pain
 
+* In the next section, we demonstrated opening text files, an easy task except for one pitfall: the encoding= keyword argument is not mandatory when you open a text file, but it should be. If you fail to specify the encoding, you end up with a program that manages to generate “plain text” that is incompatible across platforms, due to conflicting default encodings. 
 
+### Unicode Text Normalization
+* String comparisons are complicated by the fact that Unicode has combining characters: diacritics and other marks that attach to the preceding character, appearing as one when printed.
+
+* Text comparisons are surprisingly complicated because Unicode provides multiple ways of representing some characters, so normalizing is a prerequisite to text matching.
+
+* The code point U+0301 is the COMBINING ACUTE ACCENT. Using it after “e” renders “é”. In the Unicode standard, sequences like 'é' and 'e\u0301' are called “canonical equivalents,” and applications are supposed to treat them as the same. But Python sees two different sequences of code points, and considers them not equal.
+
+* The solution is to use Unicode normalization, provided by the unicodedata.normalize function.
+
+#### CASE FOLDING
+* Case folding is essentially converting all text to lowercase, with some additional transformations. It is supported by the str.casefold() method.
+
+#### EXTREME “NORMALIZATION”: TAKING OUT DIACRITICS
+
+### Sorting Unicode Text
+* Python sorts sequences of any type by comparing the items in each sequence one by one. For strings, this means comparing the code points. Unfortunately, this produces unacceptable results for anyone who uses non-ASCII characters.
+
+* The standard way to sort non-ASCII text in Python is to use the locale.strxfrm function which, according to the locale module docs, “transforms a string to one that can be used in locale-aware comparisons.”
+* To enable locale.strxfrm, you must first set a suitable locale for your application, and pray that the OS supports it. On GNU/Linux (Ubuntu 14.04) with the pt_BR locale. 
+* So you need to call setlocale(LC_COLLATE, «your_locale») before using locale.strxfrm as the key when sorting.
+
+* So the standard library solution to internationalized sorting works, but seems to be well supported only on GNU/Linux (perhaps also on Windows, if you are an expert). Even then, it depends on locale settings, creating deployment headaches.
+Fortunately, there is a simpler solution: the PyUCA library, available on PyPI.
+
+#### SORTING WITH THE UNICODE COLLATION ALGORITHM
+
+### The Unicode Database
+* (a source of metadata about every character)
+* The Unicode standard provides an entire database—in the form of numerous structured text files—that includes not only the table mapping code points to character names, but also metadata about the individual characters and how they are related.
+
+## Dual-Mode str and bytes APIs
+* dual-mode APIs offering functions that accept `str` or `bytes` arguments with special handling depending on the type.
+* Some examples are in the re and os modules.
+
+## STR VERSUS BYTES ON OS FUNCTIONS
+* The GNU/Linux kernel is not Unicode savvy, so in the real world you may find filenames made of byte sequences that are not valid in any sensible encoding scheme, and cannot be decoded to str. File servers with clients using a variety of OSes are particularly prone to this problem.
+
+In order to work around this issue, all os module functions that accept filenames or pathnames take arguments as str or bytes.
 
 
 
