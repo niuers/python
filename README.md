@@ -13,7 +13,7 @@
 # Python Data Model
 > The data model is a description of Python as a framework. It formalizes the interfaces of the building blocks of the language itself, such as sequences, iterators, functions, classes, context managers, and so on.
 
-* The **Python interpreter** invokes special methods (Dunder methods) to perform basic object operations, often triggered by special syntax. e.g., __getitem__ ("dunder-getitem").
+* The **Python interpreter** invokes special methods (Dunder methods) to perform basic object operations, often triggered by special syntax. e.g., `__getitem__` ("dunder-getitem").
   * For example, in order to evaluate `my_collection[key]`, the interpreter calls `my_collection.__getitem__(key)`.
 
 * Advantages of Python Data Model
