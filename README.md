@@ -1,19 +1,55 @@
 # Table of Contents
+* [The Zen of Python](#the-zen-of-python)
 * [Python Overview](#python-overview)
 * [Python Data Model](#python-data-model)
-* [Python Characteristics](#python-characteristics)
 * [Characters and Bytes](#characters-and-bytes)
 * [What is Pythonic?](#what-is-pythonic)
 * [Python names and values](#python-names-and-values)
 * [References](#references)
 
+# [The Zen of Python](https://www.python.org/doc/humor/#the-zen-of-python)
+* Beautiful is better than ugly.
+* Explicit is better than implicit.
+* Simple is better than complex.
+* Complex is better than complicated.
+* Flat is better than nested.
+* Sparse is better than dense.
+* Readability counts.
+* Special cases aren't special enough to break the rules.
+* Although practicality beats purity
+* Errors should never pass silently.
+* Unless explicitly silenced.
+* In the face of ambiguity, refuse the temptation to guess.
+* There should be one-- and preferably only one --obvious way to do it.
+* Although that way may not be obvious at first unless you're Dutch.
+* Now is better than never.
+* Although never is often better than right now.
+* If the implementation is hard to explain, it's a bad idea.
+* If the implementation is easy to explain, it may be a good idea.
+* Namespaces are one honking great idea -- let's do more of those!
+
+—Tim Peters
+
 # Python Overview
 * One of the best qualities of Python is its consistency.
 
-# Python Data Model
-> The data model is a description of Python as a framework. It formalizes the interfaces of the building blocks of the language itself, such as sequences, iterators, functions, classes, context managers, and so on.
+## Python Characteristics
+#### Interpreted rather than compiled
+#### Dynamic type system
+#### Pass by value with object references
+#### Modular capability
+#### Comprehensive libraries
+#### Extensibility with respect to other languages
+#### Object orientation
+#### Most of the major programming paradigms-procedural, object-oriented, and to a lesser extent, functional.
 
-* The **Python interpreter** invokes special methods (Dunder methods) to perform basic object operations, often triggered by special syntax. e.g., `__getitem__` ("dunder-getitem").
+
+# Python Data Model
+
+### Python Data Model Overview
+> The data model is a description of Python as a framework. It formalizes the interfaces of the building blocks of the language itself, such as sequences, iterators, functions, classes, context managers, and so on. It's about “The properties of objects in general in a specific computer programming language.”
+
+* The **Python interpreter** invokes special methods (Dunder methods or Magic methods) to perform basic object operations, often triggered by special syntax. e.g., `__getitem__` ("dunder-getitem").
   * For example, in order to evaluate `my_collection[key]`, the interpreter calls `my_collection.__getitem__(key)`.
 
 * Advantages of Python Data Model
@@ -29,10 +65,11 @@
   
 * Normally, your code should not have many direct calls to special methods. Unless you are doing a lot of metaprogramming, you should be implementing special methods more often than invoking them explicitly. 
 
+### Metaobject Protocol
 
+* The **metaobject** part refers to the objects that are the building blocks of the language itself. In this context, **protocol** is a synonym of interface. So a metaobject protocol is a fancy synonym for **object model**: an API for core language constructs.
+* A rich metaobject protocol enables extending a language to support new programming paradigms.
 
-  
-  
 ### Comparison with Object Oriented Language (OOL)
 * `collection.len()` in OOL vs. `len(collection)` in Python
 
@@ -49,15 +86,6 @@ print("size: ", len(myints))
 ```
 
 
-# Python Characteristics
-### Interpreted rather than compiled
-### Dynamic type system
-### Pass by value with object references
-### Modular capability
-### Comprehensive libraries
-### Extensibility with respect to other languages
-### Object orientation
-### Most of the major programming paradigms-procedural, object-oriented, and to a lesser extent, functional.
 
 # Characters and Bytes
 > String: String is a sequence of characters.
@@ -340,18 +368,11 @@ Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-
 
 # References
 1. 7 weeks for 7 programming languages
-
 1. 7 Concurrency Models in 7 Weeks: When Threads Unravel
-
 1. 7 weeks for Database
-
 1. Pragmatic programming languages
-
 1. Pycon Russia Presentation: Hettinger
-
 1. David Beazley GIL
-
 1. Fluent Python
-
 1. Python Cookbook
-
+1. The Art of the Metaobject Protocol (AMOP)
