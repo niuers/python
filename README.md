@@ -1,6 +1,53 @@
 # Table of Contents
+* [Python Overview](#python-overview)
+* [Python Data Model](#python-data-model)
 * [Python Characteristics](#python-characteristics)
 * [Characters and Bytes](#characters-and-bytes)
+* [What is Pythonic?](#what-is-pythonic)
+* [Python names and values](#python-names-and-values)
+* [References](#references)
+
+# Python Overview
+* One of the best qualities of Python is its consistency.
+
+# Python Data Model
+> The data model is a description of Python as a framework. It formalizes the interfaces of the building blocks of the language itself, such as sequences, iterators, functions, classes, context managers, and so on.
+
+* The **Python interpreter** invokes special methods (Dunder methods) to perform basic object operations, often triggered by special syntax. e.g., __getitem__ ("dunder-getitem").
+  * For example, in order to evaluate `my_collection[key]`, the interpreter calls `my_collection.__getitem__(key)`.
+
+* Advantages of Python Data Model
+  * The users of your classes don’t have to memorize arbitrary method names for standard operations (.size()? .len()? )
+  * It’s easier to benefit from the core language features (e.g., iteration and slicing) and the rich Python standard library (and avoid reinventing the wheel, like the `random.choice function`).
+
+### How Special Methods Are Used
+* The special methods are meant to be called by the Python interpreter, and not by you.
+  * But for built-in types like `list`, `str`, `bytearray`, and so on, the interpreter takes a shortcut: the CPython implementation of `len()` actually returns the value of the `ob_size` field in the `PyVarObject C struct` that represents any variable-sized built-in object in memory. This is much faster than calling a method.
+  
+* More often than not, the special method call is implicit. 
+  * For example, the statement `for i in x:` actually causes the invocation of `iter(x)`, which in turn may call `x.__iter__()` if that is available.
+  
+* Normally, your code should not have many direct calls to special methods. Unless you are doing a lot of metaprogramming, you should be implementing special methods more often than invoking them explicitly. 
+
+
+
+  
+  
+### Comparison with Object Oriented Language (OOL)
+* `collection.len()` in OOL vs. `len(collection)` in Python
+
+Given a collection of items, C++ and Python use different syntax to obtain the size of the collection.
+
+```
+# C++
+std::vector<int> myints;
+std::cout << "size: " << myints.size() << '\n';
+
+# Python
+myints = [1,2,3]
+print("size: ", len(myints))
+```
+
 
 # Python Characteristics
 ### Interpreted rather than compiled
