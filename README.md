@@ -47,8 +47,55 @@
 # Python Data Model
 
 ### Python Data Model Overview
-> The data model is a description of Python as a framework. It formalizes the interfaces of the building blocks of the language itself, such as sequences, iterators, functions, classes, context managers, and so on. It's about “The properties of objects in general in a specific computer programming language.”
+> The Python data model (or object model) is a description of Python as a framework. It formalizes the interfaces of the building blocks of the language itself, such as sequences, iterators, functions, classes, context managers, and so on. It's about “The properties of objects in general in a specific computer programming language.”
 
+### Objects in Python
+
+* Objects are Python's abstraction for Data. All data in a Python program is represented by objects or by relations between objects. Every object has an identity, a type and a value. 
+
+#### Object Identity
+* An object’s identity never changes once it has been created; you may think of it as the object’s address in memory (e.g. CPython). The `is` operator compares the identity of two objects; the `id()` function returns an integer representing its identity.
+
+#### Object Type
+* An object’s type determines the operations that the object supports (e.g., “does it have a length?”) and also defines the possible values for objects of that type. 
+* The `type()` function returns an object’s type (which is an object itself). 
+* Like its identity, an object’s type is also unchangeable (It is possible in some cases to change an object’s type, under certain controlled conditions.).
+  
+#### Object Value
+* The value of some objects can change. (mutable vs. immutable objects)
+
+#### Garbage Collection
+* Objects are never explicitly destroyed; however, when they become unreachable they **may** be garbage-collected (not guaranteed and it's implementation dependent)
+  * CPython currently uses a **reference-counting scheme** with (optional) **delayed detection of cyclically linked garbage**, which collects most objects as soon as they become unreachable, but is not guaranteed to collect garbage containing circular references. See the `gc` module. Do not depend on immediate finalization of objects when they become unreachable (so you should always close files explicitly).
+
+#### Containers
+* Containers contain references to other objects. The references are part of a container’s value. 
+  * In most cases, when we talk about the value of a container, we imply the values, not the identities of the contained objects;   
+  * However, when we talk about the mutability of a container, only the identities of the immediately contained objects are implied. So, if an immutable container (like a tuple) contains a reference to a mutable object, its value changes if that mutable object is changed.
+
+#### Object Types Impact Identity
+* Types affect almost all aspects of object behavior. Even the importance of object identity is affected in some sense.
+  * For immutable types, operations that compute new values may actually return a reference to any existing object with the same type and value, while for mutable objects this is not allowed.
+  * Example: after `a = 1; b = 1`, `a` and `b` may or may not refer to the same object with the value one, depending on the implementation, but after `c = []; d = []`, `c` and `d` are *guaranteed* to refer to two different, unique, newly created empty lists. (Note that `c = d = []` assigns the same object to both `c` and `d`.)
+
+#### Data Types
+* Python does not support single-precision floating point numbers.
+* Immutable types
+  * Strings
+  * Tuples
+  * Bytes
+  * FrozenSet
+* Mutable types
+  * Lists
+  * Set
+  * Dict
+    * The only types of values not acceptable as keys are values containing lists or dictionaries or other mutable types that are compared by value rather than by object identity, the reason being that the efficient implementation of dictionaries requires a key’s hash value to remain constant. Numeric types used for keys obey the normal rules for numeric comparison: if two numbers compare equal (e.g., 1 and 1.0) then they can be used interchangeably to index the same dictionary entry.
+  * ByteArray
+
+
+
+
+### Dunder Methods
 * The **Python interpreter** invokes special methods (Dunder methods or Magic methods) to perform basic object operations, often triggered by special syntax. e.g., `__getitem__` ("dunder-getitem").
   * For example, in order to evaluate `my_collection[key]`, the interpreter calls `my_collection.__getitem__(key)`.
 
@@ -85,10 +132,13 @@ myints = [1,2,3]
 print("size: ", len(myints))
 ```
 
+### References
+* [Alex Martelli](#alex-martellis-python-in-a-nutshell-2e)
+* [Python Data Model](#https://docs.python.org/3/reference/datamodel.html)
 
 
 # Characters and Bytes
-> String: String is a sequence of characters.
+> String: String is a sequence of characters (values) that represent Unicode code points.
 
 * The definition of characters here are "unicode characters" for python 3.x. The items you get out of `str` are unicode characters.
   ```
@@ -367,7 +417,7 @@ Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-
 
 
 # References
-1. 7 weeks for 7 programming languages
+#### 7 weeks for 7 programming languages
 1. 7 Concurrency Models in 7 Weeks: When Threads Unravel
 1. 7 weeks for Database
 1. Pragmatic programming languages
@@ -376,3 +426,5 @@ Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-
 1. Fluent Python
 1. Python Cookbook
 1. The Art of the Metaobject Protocol (AMOP)
+#### Alex Martelli’s Python in a Nutshell 2E
+#### David Beazley’s Python Essential Reference 4E
