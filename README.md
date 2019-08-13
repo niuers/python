@@ -34,14 +34,54 @@
 * One of the best qualities of Python is its consistency.
 
 ## Python Characteristics
+* Python adheres to the idea that, if a language behaves a certain way in some contexts, it should ideally work similarly in all contexts. 
+* Python also follows the principle that a language should not have “convenient” shortcuts, special cases, ad hoc exceptions, overly subtle distinctions, or mysterious and tricky under-the-covers optimizations. A good language, like any other well-designed artifact, must balance such general principles with taste, common sense, and a high degree of practicality.
+
+#### Very High Level Language (VHLL)
+* Python is a very high-level language (VHLL). This means that Python uses a higher level of abstraction, conceptually further from the underlying machine, than do classic compiled languages such as C, C++, and Fortran, which are traditionally called “high-level languages.” 
+* Python is simpler, faster to process (both for human brains and for programmatic tools), and more regular than classic high-level languages. 
+* This enables high programmer productivity and makes Python an attractive development tool. Good compilers for classic compiled languages can generate binary machine code that runs faster than Python code. However, in most cases, the performance of Python-coded applications is sufficient. When it isn’t, apply the optimization techniques covered in “Optimization” to improve your program’s performance while keeping the benefit of high productivity.
+
+* Somewhat newer languages such as Java and C# are slightly higher-level than classic ones such as C and Fortran, and share some characteristics of classic languages (such as the need to use declarations) as well as some of VHLLs like Python (such as the use of portable bytecode as the compilation target in typical implementations, and garbage collection to relieve programmers from the need to manage memory).
+* In terms of language level, Python is comparable to other powerful VHLLs like JavaScript, Ruby, and Perl. The advantages of simplicity and regularity, however, remain on Python’s side.
+
+#### Cross-Platform
+
 #### Interpreted rather than compiled
 #### Dynamic type system
 #### Pass by value with object references
 #### Modular capability
 #### Comprehensive libraries
 #### Extensibility with respect to other languages
-#### Object orientation
-#### Most of the major programming paradigms-procedural, object-oriented, and to a lesser extent, functional.
+#### Support most of the major programming paradigms
+* Procedural
+* Object-oriented
+* To a lesser extent, functional.
+
+## Python Implementations
+
+* The primary difference between the implementations is the environment in which they run and the libraries and frameworks they can use.
+* CPython applications are often faster than Jython or IronPython, particularly if you use extension modules such as NumPy (covered in “Array Processing”); however, PyPy can often be even faster, thanks to just-in-time compilation to machine code. It may be worthwhile to benchmark your CPython code against PyPy.
+
+### CPython
+* CPython is a compiler, interpreter, and set of built-in and optional extension modules, all coded in standard C.
+
+### Jython
+* Jython is a Python implementation for any Java Virtual Machine (JVM) compliant with Java 7 or better, written in Java.
+
+### IronPython
+* IronPython is a Python implementation for the Microsoft-designed Common Language Runtime (CLR), most commonly known as .NET, written in C#.
+
+### PyPy
+* PyPy is a fast and flexible implementation of Python, coded in a subset of Python itself, able to target several lower-level languages and virtual machines using advanced techniques such as type inferencing. PyPy’s greatest strength is its ability to generate native machine code “just in time” as it runs your Python program. 
+* PyPy has substantial advantages in speed and memory management, and is seeing production-level use.
+
+### Pyston
+* A new high-performance implementation in early development
+
+# Python Interpreter
+* The Python interpreter program is run as **python** (it’s named python.exe on Windows). 
+* **python** includes both the interpreter itself and the Python compiler, which is implicitly invoked, as and if needed, on imported modules.
 
 
 # Python Data Model
@@ -94,7 +134,6 @@
 
 
 
-
 ### Dunder Methods
 * The **Python interpreter** invokes special methods (Dunder methods or Magic methods) to perform basic object operations, often triggered by special syntax. e.g., `__getitem__` ("dunder-getitem").
   * For example, in order to evaluate `my_collection[key]`, the interpreter calls `my_collection.__getitem__(key)`.
@@ -135,6 +174,23 @@ print("size: ", len(myints))
 ### References
 * [Alex Martelli](#alex-martellis-python-in-a-nutshell-2e)
 * [Python Data Model](#https://docs.python.org/3/reference/datamodel.html)
+
+# Sequences
+## Classifications
+#### Container Sequences vs. Flat Sequences
+* Container Sequences
+> list, tuple, and collections.deque can hold items of different types. Container sequences hold references to the objects they contain, which may be of any type.
+
+* Flat Sequences
+> str, bytes, bytearray, memoryview, and array.array hold items of one type. Flat sequences physically store the value of each item within its own memory space, and not as distinct objects. Thus, flat sequences are more compact, but they are limited to holding primitive values like characters, bytes, and numbers.
+
+#### Mutable Sequences vs. Immutable Sequences
+* Mutable Sequences: list, bytearray, array.array, collections.deque, and memoryview
+* Immutable sequences: tuple, str, and bytes
+
+## List
+#### List Comprehension
+
 
 
 # Characters and Bytes
@@ -331,7 +387,10 @@ The flexible string representation is similar to the way the int type works in P
 
 
 # What is Pythonic?
+
 1. Generic operations on sequence
+   * Strings, lists, byte sequences, arrays, XML elements, and database results share a rich set of common operations including iteration, slicing, sorting, and concatenation.
+   
 1. Strong typing without variable declaration
 1. An important Python API convention: functions or methods that change an object in place should return None to
 make it clear to the caller that the object itself was changed, and no new object was created. e.g. list.sort()
@@ -349,9 +408,9 @@ x = 12 #Names are reassigned independently of other names.
 * Values live until nothing refers to them. A value is 'garbage collected' (reclaimed) when there's no name refers to it. Think about 'reference counting' pattern in C++.
 
 ## Mutable and immutable values
-* Immutable values: numbers, strings, and tuples. 
+* Immutable values: numbers, strings, bytes, and tuples. 
 Immutable means that the value can never change, instead when you think you are changing the value, you are really making new values from old ones.
-* Mutable values: Almost everything else is mutable, including lists, dicts, and user-defined objects. 
+* Mutable values: Almost everything else is mutable, including lists, dicts, bytearray, array.array, collections.deque, memoryview and user-defined objects. 
 Mutable means that the value has methods that can change the value in-place. 
 
 ## Assignment never makes new values, it never copies data
