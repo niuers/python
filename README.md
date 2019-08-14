@@ -2,6 +2,7 @@
 * [The Zen of Python](#the-zen-of-python)
 * [Python Overview](#python-overview)
 * [Python Data Model](#python-data-model)
+* [Python Sequences](./python_sequences.md)
 * [Characters and Bytes](#characters-and-bytes)
 * [What is Pythonic?](#what-is-pythonic)
 * [Python names and values](#python-names-and-values)
