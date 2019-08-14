@@ -7,7 +7,8 @@
 * [When a List Is Not the Answer](#when-a-list-is-not-the-answer)
 * [Common Operations to Python Sequences](#common-operations-to-python-sequences)
   * [Slicing](#slicing)
-  * [Using + and * with Sequences](#using-+-and-*-with-sequences)
+  * [Using + and * with Sequences](#using--and--with-sequences)
+  * [Augmented Assignment (`+=` or `*=`) with Sequences](#)
 
 # Classifications
 ### Container Sequences vs. Flat Sequences
