@@ -6,6 +6,7 @@
 * [Characters and Bytes](#characters-and-bytes)
 * [What is Pythonic?](#what-is-pythonic)
 * [Python names and values](#python-names-and-values)
+* [Techniques](#techniques)
 * [References](#references)
 
 # [The Zen of Python](https://www.python.org/doc/humor/#the-zen-of-python)
@@ -452,6 +453,12 @@ When we say that a function has a local variable, we mean that the name is scope
 
 ## Pass Argument
 Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-reference”](https://robertheaton.com/2014/02/09/pythons-pass-by-object-reference-as-explained-by-philip-k-dick/), i.e. object references are passed by value.
+# Techniques
+* Check the byte code Python generated
+```
+>>> import dis
+>>> dis.dis('a*2')
+```
 
 #### Others
 
