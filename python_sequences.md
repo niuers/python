@@ -1,3 +1,9 @@
+# Table of Contents
+* [Classifications](#classifications)
+* [List](#list)
+* [Tuples](#tuples)
+* [When a List Is Not the Answer](#when-a-list-is-not-the-answer)
+* [Common Operations to Python Sequences](#common-operations-to-python-sequences)
 
 # Classifications
 ### Container Sequences vs. Flat Sequences
