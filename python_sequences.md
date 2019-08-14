@@ -2,13 +2,18 @@
 * [Classifications](#classifications)
 * [List](#list)
 * [Tuples](#tuples)
+  * [Tuples as records](#tuples-as-records)
+  * [TUPLES AS IMMUTABLE LISTS](#tuples-as-immutable-lists)
 * [When a List Is Not the Answer](#when-a-list-is-not-the-answer)
 * [Common Operations to Python Sequences](#common-operations-to-python-sequences)
+  * [Slicing](#slicing)
+  * [Using + and * with Sequences](#using-+-and-*-with-sequences)
 
 # Classifications
 ### Container Sequences vs. Flat Sequences
 * Container Sequences
 > list, tuple, and collections.deque can hold items of different types. Container sequences hold references to the objects they contain, which may be of any type.
+
 
 * Flat Sequences
 > str, bytes, bytearray, memoryview, and array.array hold items of one type. Flat sequences physically store the value of each item within its own memory space, and not as distinct objects. Thus, flat sequences are more compact, faster and easier to use, but they are limited to holding primitive values like characters, bytes, and numbers.
@@ -45,9 +50,13 @@ list1, list2 = zip(*sorted(zip(list1, list2)))
 ```
 
 # Tuples
+
 * They can be used as immutable lists and also as records with no field names.
+
 ## Tuples as records
 * Tuples hold records: each item in the tuple holds the data for one field and the position of the item gives its meaning.
+* Unlike lists, tuples often hold items of different types. That is natural, considering that each item in a tuple is really a field, and each field type is independent of the others.
+
 ### Iterable/Tuple Unpacking
 > Iterable unpacking works with any iterable object. The only requirement is that the iterable yields exactly one item per variable in the receiving tuple, unless you use a star (*) to capture excess items
 
@@ -200,11 +209,16 @@ TypeError: 'tuple' object does not support item assignment
 
 ## `list.sort` and the `sorted` Built-In Function
 * list.sort is in-place sort, while `sorted` always returns a new sequence.
+* The `key` optional argument of `list.sort`, `sorted`, `max`, and `min` is a great idea. 
+  * It is also more efficient because the `key` function is invoked only once per item. Of course, Python also has to compare the keys while sorting, but that comparison is done in optimized C code and not in a Python function that you wrote.
+
+
 
 #### Managing Ordered Sequences with bisect
 * Use `bisect.insort` does both steps of search and insert for you (i.e. `index = bisect.bisect(haystack, needle)` and `haystack.insert(index, needle)`), and is faster.
 
 #### Timsort
+* The sorting algorithm used in sorted and list.sort is Timsort, an adaptive algorithm that switches from insertion sort to merge sort strategies, depending on how ordered the data is.
 * Timsort, the sorting algorithm used in Python, is **stable** (i.e., it preserves the relative ordering of items that compare equal). 
 
 
