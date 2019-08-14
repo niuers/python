@@ -155,6 +155,12 @@ TypeError: 'tuple' object does not support item assignment
 (1, 2, [30, 40, 50, 60])
 ```
 
+* Best Practices
+  * Putting mutable items in tuples is not a good idea.
+  * Augmented assignment is not an atomic operation—we just saw it throwing an exception after doing part of its job.
+  * Inspecting Python bytecode is not too difficult, and is often helpful to see what is going on under the hood.
+
+## `list.sort` and the `sorted` Built-In Function
 
 
 
