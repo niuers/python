@@ -9,7 +9,7 @@
   * [Slicing](#slicing)
   * [Using + and * with Sequences](#using--and--with-sequences)
   * [Augmented Assignment (`+=` or `*=`) with Sequences](#augmented-assignment--or--with-sequences)
-  * [`list.sort` and the `sorted` Built-In Function](#)
+  * [`list.sort` and the `sorted` Built-In Function](#listsort-and-the-sorted-built-in-function)
 
 # Classifications
 ### Container Sequences vs. Flat Sequences
