@@ -6,6 +6,7 @@
 * [Characters and Bytes](#characters-and-bytes)
 * [What is Pythonic?](#what-is-pythonic)
 * [Python names and values](#python-names-and-values)
+* [Libraries](#libraries)
 * [Techniques](#techniques)
 * [References](#references)
 
@@ -453,6 +454,16 @@ When we say that a function has a local variable, we mean that the name is scope
 
 ## Pass Argument
 Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-reference”](https://robertheaton.com/2014/02/09/pythons-pass-by-object-reference-as-explained-by-philip-k-dick/), i.e. object references are passed by value.
+
+# Libraries
+## NumPy
+* NumPy implements multi-dimensional, homogeneous arrays and matrix types that hold not only numbers but also user-defined records, and provides efficient elementwise operations.
+
+## SciPy
+* SciPy is a library, written on top of NumPy, offering many scientific computing algorithms from linear algebra, numerical calculus, and statistics. 
+* SciPy is fast and reliable because it leverages the widely used C and Fortran code base from the Netlib Repository. 
+
+
 # Techniques
 * Check the byte code Python generated
 ```
@@ -462,10 +473,13 @@ Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-
 * An important Python API convention: functions or methods that change an object in place should return `None` to make it clear to the caller that the object itself was changed, and no new object was created.
   * list.sort, random.shuffle
 
+* High-resolution performance measurement timer
+```
+from time import perf_counter as pc
+t0 = pc(); floats /= 3; pc() - t0
+```
 
 #### Others
-
-* For every sequence in python (except `str`), `s[i]` returns one item, and `s[i:i+1]` returns a sequence of the same type with the `s[1]` item inside it. The only sequence type where `s[0] == s[:1]` is the `str` type.
 
 
 # References
