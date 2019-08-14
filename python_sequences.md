@@ -5,7 +5,7 @@
 > list, tuple, and collections.deque can hold items of different types. Container sequences hold references to the objects they contain, which may be of any type.
 
 * Flat Sequences
-> str, bytes, bytearray, memoryview, and array.array hold items of one type. Flat sequences physically store the value of each item within its own memory space, and not as distinct objects. Thus, flat sequences are more compact, but they are limited to holding primitive values like characters, bytes, and numbers.
+> str, bytes, bytearray, memoryview, and array.array hold items of one type. Flat sequences physically store the value of each item within its own memory space, and not as distinct objects. Thus, flat sequences are more compact, faster and easier to use, but they are limited to holding primitive values like characters, bytes, and numbers.
 
 ### Mutable Sequences vs. Immutable Sequences
 * Mutable Sequences: list, bytearray, array.array, collections.deque, and memoryview
@@ -40,7 +40,7 @@ list1, list2 = zip(*sorted(zip(list1, list2)))
 
 # Tuples
 * They can be used as immutable lists and also as records with no field names.
-### Tuples as records
+## Tuples as records
 * Tuples hold records: each item in the tuple holds the data for one field and the position of the item gives its meaning.
 ### Iterable/Tuple Unpacking
 > Iterable unpacking works with any iterable object. The only requirement is that the iterable yields exactly one item per variable in the receiving tuple, unless you use a star (*) to capture excess items
@@ -87,7 +87,7 @@ list1, list2 = zip(*sorted(zip(list1, list2)))
 * The collections.namedtuple function is a factory that produces subclasses of tuple enhanced with field names and a class name—which helps debugging.
 * Instances of a class that you build with namedtuple take exactly the same amount of memory as tuples because the field names are stored in the class. They use less memory than a regular object because they don’t store attributes in a per-instance __dict__.
 
-### TUPLES AS IMMUTABLE LISTS
+## TUPLES AS IMMUTABLE LISTS
 * tuple supports all list methods that do not involve adding or removing items, with one exception—tuple lacks the __reversed__ method. However, that is just for optimization; reversed(my_tuple) works without it.
 
 # When a List Is Not the Answer
@@ -108,12 +108,26 @@ a = array.array(a.typecode, sorted(a))
 ## Memoryview
 * The built-in memorview class is a shared-memory sequence type that lets you handle slices of arrays without copying bytes.
 * A memoryview is essentially a generalized NumPy array structure in Python itself (without the math). It allows you to share memory between data-structures (things like PIL images, SQLlite databases, NumPy arrays, etc.) without first copying. This is very important for large data sets.
+* [A short tutorial](https://eli.thegreenplace.net/2011/11/28/less-copies-in-python-with-the-buffer-protocol-and-memoryviews/)
+
+## DEQUES AND OTHER QUEUES
+* The .append and .pop methods make a list usable as a stack or a queue (if you use .append and .pop(0), you get LIFO behavior). But inserting and removing from the left of a list (the 0-index end) is costly because the entire list must be shifted.
+* The class collections.deque is a thread-safe double-ended queue designed for fast inserting and removing from both ends. 
+* There is a hidden cost: removing items from the middle of a deque is not as fast. It is really optimized for appending and popping from the ends.
+* The append and popleft operations are atomic, so deque is safe to use as a LIFO queue in multithreaded applications without the need for using locks.
+
+
+
+
+
 # Common Operations to Python Sequences
 ## Slicing
 ### Slice Object
 
 * To evaluate the expression `seq[start:stop:step]`, Python calls `seq.__getitem__(slice(start, stop, step))`.
 * The built-in sequence types in Python are one-dimensional, so they support only one index or slice, and not a tuple of them.
+* For every sequence in python (except `str`), `s[i]` returns one item, and `s[i:i+1]` returns a sequence of the same type with the `s[1]` item inside it. The only sequence type where `s[0] == s[:1]` is the `str` type.
+* [Why numbering should start at zero?](https://www.cs.utexas.edu/users/EWD/transcriptions/EWD08xx/EWD831.html)
 
 #### Multidimensional Slice
 * Items of a two-dimensional `numpy.ndarray` can be fetched using the syntax `a[i, j]` and a **two-dimensional slice** obtained with an expression like `a[m:n, k:l]`. 
