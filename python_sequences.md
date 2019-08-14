@@ -8,7 +8,8 @@
 * [Common Operations to Python Sequences](#common-operations-to-python-sequences)
   * [Slicing](#slicing)
   * [Using + and * with Sequences](#using--and--with-sequences)
-  * [Augmented Assignment (`+=` or `*=`) with Sequences](#)
+  * [Augmented Assignment (`+=` or `*=`) with Sequences](#augmented-assignment--or--with-sequences)
+  * [`list.sort` and the `sorted` Built-In Function](#)
 
 # Classifications
 ### Container Sequences vs. Flat Sequences
