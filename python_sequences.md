@@ -90,6 +90,24 @@ list1, list2 = zip(*sorted(zip(list1, list2)))
 ### TUPLES AS IMMUTABLE LISTS
 * tuple supports all list methods that do not involve adding or removing items, with one exception—tuple lacks the __reversed__ method. However, that is just for optimization; reversed(my_tuple) works without it.
 
+# When a List Is Not the Answer
+* If you need to store 10 million floating-point values, an `array` is much more efficient, because an `array` does not actually hold full-fledged **float objects**, but only the packed bytes representing their machine values—just like an array in the C language. 
+* On the other hand, if you are constantly adding and removing items from the ends of a `list` as a FIFO or LIFO data structure, a `deque` (double-ended queue) works faster.
+* If your code does a lot of containment checks (e.g., `item in my_collection`), consider using a `set` for `my_collection`, especially if it holds a large number of items. Sets are optimized for fast membership checking. But they are not sequences (their content is unordered).
+
+## Arrays
+
+* If the list will only contain numbers, an `array.array` is more efficient than a `list`: it supports all mutable sequence operations (including .pop, .insert, and .extend), and additional methods for fast loading and saving such as .frombytes and .tofile.
+  * Another fast and more flexible way of saving numeric data is the pickle module for object serialization. Saving an array of floats with pickle.dump is almost as fast as with array.tofile—however, pickle handles almost all built-in types, including complex numbers, nested collections, and even instances of user-defined classes automatically (if they are not too tricky in their implementation).
+* A Python array is as lean as a C array.
+* To sort an array
+```
+a = array.array(a.typecode, sorted(a))
+```
+
+## Memoryview
+* The built-in memorview class is a shared-memory sequence type that lets you handle slices of arrays without copying bytes.
+* A memoryview is essentially a generalized NumPy array structure in Python itself (without the math). It allows you to share memory between data-structures (things like PIL images, SQLlite databases, NumPy arrays, etc.) without first copying. This is very important for large data sets.
 # Common Operations to Python Sequences
 ## Slicing
 ### Slice Object
@@ -161,7 +179,13 @@ TypeError: 'tuple' object does not support item assignment
   * Inspecting Python bytecode is not too difficult, and is often helpful to see what is going on under the hood.
 
 ## `list.sort` and the `sorted` Built-In Function
+* list.sort is in-place sort, while `sorted` always returns a new sequence.
 
+#### Managing Ordered Sequences with bisect
+* Use `bisect.insort` does both steps of search and insert for you (i.e. `index = bisect.bisect(haystack, needle)` and `haystack.insert(index, needle)`), and is faster.
+
+#### Timsort
+* Timsort, the sorting algorithm used in Python, is **stable** (i.e., it preserves the relative ordering of items that compare equal). 
 
 
 
