@@ -459,6 +459,9 @@ Python is neither pass-by-value nor pass-by-reference, it is [“pass-by-object-
 >>> import dis
 >>> dis.dis('a*2')
 ```
+* An important Python API convention: functions or methods that change an object in place should return `None` to make it clear to the caller that the object itself was changed, and no new object was created.
+  * list.sort, random.shuffle
+
 
 #### Others
 
