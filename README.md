@@ -193,7 +193,7 @@ print("size: ", len(myints))
 #### The Identity of Characters and Specific Byte Representations
 
 * The Unicode standard explicitly separates the identity of characters from specific byte representations:
-  * The identity of a character—its **code point**—is a number from 0 to 1,114,111 (base 10), shown in the Unicode standard as 4 to 6 hexadecimal digits with a “U+” prefix. For example, the code point for the letter A is U+0041, the Euro sign is U+20AC, and the musical symbol G clef is assigned to code point U+1D11E. About 10% of the valid code points have characters assigned to them in Unicode 6.3, the standard used in Python 3.4.
+  * The identity of a character—its **code point**—is a number from 0 to 1,114,111 (base 10), shown in the Unicode standard as 4 to 6 hexadecimal digits (1 Hex digit corresponds to 4-digit binary number) with a “U+” prefix. For example, the code point for the letter A is U+0041, the Euro sign is U+20AC, and the musical symbol G clef is assigned to code point U+1D11E. About 10% of the valid code points have characters assigned to them in Unicode 6.3, the standard used in Python 3.4.
   
 #### Encoding and Decoding
 
