@@ -20,13 +20,14 @@
 * Python dicts are highly optimized. Hash tables are the engines behind Python’s high-performance dicts.
 * The built-in functions live in __builtins__.__dict__.
 
+## `dict` and `defaultdict`
 ### An Example of Duck Typing
 * The way `update` handles its first argument `m` is a prime example of `duck typing`.
   * It first checks whether `m` has a keys method and, if it does, assumes it is a mapping. 
   * Otherwise, `update` falls back to iterating over `m`, assuming its items are (key, value) pairs. 
 * The constructor for most Python mappings uses the logic of `update` internally, which means they can be initialized from other mappings or from any iterable object producing (key, value) pairs.
 
-### HANDLING MISSING KEYS WITH SETDEFAULT
+### HANDLING MISSING KEYS WITH `setdefault`
 * In line with the **fail-fast** philosophy, `dict` access with `d[k]` raises an error when `k` is not an existing key.
 * However, `dict.get` is not the best way to handle a missing key when updating the value found (if it is mutable).
 ```
@@ -40,4 +41,33 @@ occurrences = my_dict.get(key, []) # one search
 occurrences.append(new_value)    # 
 my_dict[word] = occurrences      # Another search through my_dict
 ```
+
+### Mappings with Flexible Key Lookup
+##### `defaultdict`: ANOTHER TAKE ON MISSING KEYS
+* The mechanism that makes `defaultdict` work by calling `default_factory` is actually the `__missing__` special method, a feature supported by all standard mapping types.
+
+```
+index = collections.defaultdict(list)
+index[word].append(location)
+```
+
+##### Overwrite the `__missing__` Method
+* If you subclass `dict` and provide a `__missing__` method, the standard `dict.__getitem__` will call it whenever a key is not found, instead of raising `KeyError`.
+* The `__missing__` method is just called by `__getitem__` (i.e., for the `d[k]` operator). The presence of a `__missing__` method has no effect on the behavior of other methods that look up keys, such as get or `__contains__` (which implements the in operator). This is why the default_factory of defaultdict works only with `__getitem__`.
+* A better way to create a user-defined mapping type is to subclass `collections.UserDict` instead of `dict`
+
+### The `view` object in `dict`
+* A search like `k in my_dict.keys()` is efficient in Python 3 even for very large mappings because `dict.keys()` returns a `view` (so are `dict.values()` and `dict.items()`), which is similar to a `set`, and containment checks in `sets` are as fast as in dictionaries.
+* They provide a dynamic view on the dictionary’s entries, which means that when the dictionary changes, the view reflects these changes.
+* If all values are hashable, so that `(key, value)` pairs are unique and hashable, then the `items` view is also set-like. (`Values` views are not treated as set-like since the entries are generally not unique.) 
+
+## ChainedMap
+* A ChainMap groups multiple dicts or other mappings together to create a single, updateable view. It holds a list of mappings that can be searched as one. The lookup is performed on each mapping in order, and succeeds if the key is found in any of them. 
+* This is useful to interpreters for languages with nested scopes, where each mapping represents a scope context.
+```
+import builtins
+pylookup = ChainMap(locals(), globals(), vars(builtins))
+```
+## UserDict
+* `UserDict` is designed to be subclassed.
 
