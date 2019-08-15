@@ -2,6 +2,7 @@
 # Table of Contents
 * [Generic Mapping Types](#generic-mapping-types)
 * [Python Dicts](#python-dicts)
+* [Python Sets](#python-sets)
 
 
 # Generic Mapping Types
@@ -54,7 +55,7 @@ index[word].append(location)
 ##### Overwrite the `__missing__` Method
 * If you subclass `dict` and provide a `__missing__` method, the standard `dict.__getitem__` will call it whenever a key is not found, instead of raising `KeyError`.
 * The `__missing__` method is just called by `__getitem__` (i.e., for the `d[k]` operator). The presence of a `__missing__` method has no effect on the behavior of other methods that look up keys, such as get or `__contains__` (which implements the in operator). This is why the default_factory of defaultdict works only with `__getitem__`.
-* A better way to create a user-defined mapping type is to subclass `collections.UserDict` instead of `dict`
+
 
 ### The `view` object in `dict`
 * A search like `k in my_dict.keys()` is efficient in Python 3 even for very large mappings because `dict.keys()` returns a `view` (so are `dict.values()` and `dict.items()`), which is similar to a `set`, and containment checks in `sets` are as fast as in dictionaries.
@@ -69,5 +70,12 @@ import builtins
 pylookup = ChainMap(locals(), globals(), vars(builtins))
 ```
 ## UserDict
-* `UserDict` is designed to be subclassed.
+* `UserDict` is designed to be subclassed. A better way to create a user-defined mapping type is to subclass `collections.UserDict` instead of `dict`.
+* The main reason why it’s preferable to subclass from UserDict rather than from dict is that the built-in has some implementation shortcuts that end up forcing us to override methods that we can just inherit from UserDict with no problems.
 
+## Immutable Mappings
+* The mapping types provided by the standard library are all mutable, but you may need to guarantee that a user cannot change a mapping by mistake.
+* Since Python 3.3, the `types` module provides a wrapper class called MappingProxyType, which, given a mapping, returns a mappingproxy instance that is a read-only but dynamic view of the original mapping. This means that updates to the original mapping can be seen in the mappingproxy, but changes cannot be made through it. 
+
+
+# Python Set
