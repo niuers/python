@@ -3,7 +3,7 @@
 * [Generic Mapping Types](#generic-mapping-types)
 * [Python Dicts](#python-dicts)
   * [Handling Missing Keys](#handling-missing-keys)
-  * [The `view` object in `dict`](#)
+  * [The `view` object in `dict`](#the-view-object-in-dict)
   * [ChainedMap](#chainedmap)
   * [UserDict](#userdict)
   * [Immutable Mappings](#immutable-mappings)
