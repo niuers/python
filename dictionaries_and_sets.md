@@ -61,7 +61,8 @@ index[word].append(location)
 
 ## The `view` object in `dict`
 * A search like `k in my_dict.keys()` is efficient in Python 3 even for very large mappings because `dict.keys()` returns a `view` (so are `dict.values()` and `dict.items()`), which is similar to a `set`, and containment checks in `sets` are as fast as in dictionaries.
-* They provide a dynamic view on the dictionary’s entries, which means that when the dictionary changes, the view reflects these changes.
+* They behave more like sets than the lists returned by these methods in Python 2. 
+* They provide a dynamic view on the dictionary’s entries, they do not replicate the contents of the dict, and they immediately reflect any changes to the dict.
 * If all values are hashable, so that `(key, value)` pairs are unique and hashable, then the `items` view is also set-like. (`Values` views are not treated as set-like since the entries are generally not unique.) 
 
 ## ChainedMap
@@ -160,8 +161,6 @@ pylookup = ChainMap(locals(), globals(), vars(builtins))
   * If you are iterating over the dictionary keys and changing them at the same time, your loop may not scan all the items as expected—not even the items that were already in the dictionary before you added to it.
 
 * This is why modifying the contents of a dict while iterating through it is a bad idea. If you need to scan and add items to a dictionary, do it in two steps: read the dict from start to finish and collect the needed additions in a second dict. Then update the first one with it.
-
-* In Python 3, the .keys(), .items(), and .values() methods return dictionary views, which behave more like sets than the lists returned by these methods in Python 2. Such views are also dynamic: they do not replicate the contents of the dict, and they immediately reflect any changes to the dict.
 
 ## References
 1. Written by A.M. Kuchling—a Python core contributor and author of many pages of the official Python docs and how-tos—Chapter 18, “Python’s Dictionary Implementation: Being All Things to All People, in the book Beautiful Code (O’Reilly) includes a detailed explanation of the inner workings of the Python dict. 
