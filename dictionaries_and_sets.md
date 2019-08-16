@@ -1,27 +1,30 @@
 
 # Table of Contents
 * [Generic Mapping Types](#generic-mapping-types)
-  * [Hashable](#hashable)
 * [Python Dicts](#python-dicts)
   * [Handling Missing Keys](#handling-missing-keys)
+  * [The `view` object in `dict`](#)
+  * [ChainedMap](#chainedmap)
+  * [UserDict](#userdict)
+  * [Immutable Mappings](#immutable-mappings)
 * [Python Sets](#python-sets)
+  * [Set Literals](#set-literals)
+  * [Set Comprehensions (setcomps)](#)
+* [Hash Table](#hash-table)
+  * [Hash Buckets](#hash-buckets)
+  * [Hash Function](#hash-function)
+  * [The Hash Table Algorithm](#the-hash-table-algorithm)
+  * [Practical Consequences of Hash Table on Dicts and Sets](#practical-consequences-of-hash-table-on-dicts-and-sets)
+* [References](#references)
 
 
 # Generic Mapping Types
 * The `collections.abc` module provides the `Mapping` and `MutableMapping` `ABC`s to formalize the interfaces of dict and similar types.
 * All mapping types in the standard library use the basic dict in their implementation, so they share the limitation that the keys must be hashable (the values need not be hashable, only the keys).
 
-### Hashable
-* An object is hashable if it has a hash value which never changes during its lifetime (it needs a `__hash__()` method), and can be compared to other objects (it needs an `__eq__()` method). 
-* Hashable objects which compare equal must have the same hash value.
-  * The atomic immutable types (`str`, `bytes`, numeric types) are all hashable. 
-  * A `frozenset` is always hashable, because its elements must be hashable by definition. 
-  * A `tuple` is hashable only if all its items are hashable.
-  * User-defined types are hashable by default because their hash value is their `id()` and they all compare not equal. If an object implements a custom `__eq__` that takes into account its internal state, it may be hashable only if all its attributes are immutable.
-  
 # Python Dicts
 * Python dicts are highly optimized. Hash tables are the engines behind Python’s high-performance dicts.
-* The built-in functions live in __builtins__.__dict__.
+* The built-in functions live in `__builtins__.__dict__`.
 
 
 ### An Example of Duck Typing
@@ -109,7 +112,7 @@ pylookup = ChainMap(locals(), globals(), vars(builtins))
   
 * To be effective as hash table indexes, hash values should scatter around the index space as much as possible. This means that, ideally, objects that are similar but not equal should have hash values that differ widely.
 * Starting with Python 3.3, a random **salt** value is added to the hashes of `str`, `bytes`, and `datetime` objects. The salt value is constant within a Python process but varies between interpreter runs. The random salt is a security measure to prevent a DoS attack.
-  * This is intended to provide protection against a **denial-of-service*** (DoS) caused by carefully-chosen inputs that exploit the predictable collisions in the underlying hashing algorithms (the worst case performance of a dict insertion, O(n^2) complexity). See http://www.ocert.org/advisories/ocert-2011-003.html for details.
+  * This is intended to provide protection against a **denial-of-service*** (DoS) caused by carefully-chosen inputs that exploit the predictable collisions in the underlying hashing algorithms (the worst case performance of a dict insertion, O(n^2) complexity, really???  I thought it's O(n)). See http://www.ocert.org/advisories/ocert-2011-003.html for details.
     * The attacker, using specially crafted HTTP requests, can lead to a 100% of CPU usage which can last up to several hours depending on the targeted application and server performance, the amplification effect is considerable and requires little bandwidth and time on the attacker side.
   * Changing hash values affects the iteration order of sets. Python has never made guarantees about this ordering (and it typically varies between 32-bit and 64-bit builds).
 
@@ -135,22 +138,28 @@ pylookup = ChainMap(locals(), globals(), vars(builtins))
 
 #### Keys must be hashable objects
 * An object is hashable if all of these requirements are met:
-  * It supports the hash() function via a hash() method that always returns the same value over the lifetime of the object.
-  * It supports equality via an eq() method.
+  * It supports the `hash()` function via a `__hash__()` method that always returns the same value over the lifetime of the object.
+  * It supports equality comparison via an `eq()` method (`__eq__()`).
   * If a == b is True then hash(a) == hash(b) must also be True.
+  
+### Hashable Objects
+* Hashable objects which compare equal must have the same hash value.  
+* The atomic immutable types (`str`, `bytes`, numeric types) are all hashable.
+* A `frozenset` is always hashable, because its elements must be hashable by definition. 
+* A `tuple` is hashable only if all its items are hashable.
 * User-defined types are hashable by default because their hash value is their id() and they all compare not equal.
   * If you implement a class with a custom `__eq__` method, you must also implement a suitable `__hash__`, because you must always make sure that if `a == b` is True then `hash(a) == hash(b)` is also True. Otherwise you are breaking an invariant of the hash table algorithm, with the grave consequence that dicts and sets will not deal reliably with your objects. 
-  * If a custom `__eq__` depends on mutable state, then `__hash__` must raise TypeError with a message like unhashable type: 'MyClass'.
+  * If a custom `__eq__` depends on mutable state, then `__hash__` must raise `TypeError` with a message like unhashable type: 'MyClass'. That is it may be hashable only if all its attributes are immutable.
 
 #### dicts have significant memory overhead
 * If you are handling a large quantity of records, it makes sense to store them in a list of tuples or named tuples instead of using a list of dictionaries in JSON style, with one dict per record. Replacing dicts with tuples reduces the memory usage in two ways: 
   * by removing the overhead of one hash table per record
   * by not storing the field names again with each record.
-* For user-defined types, the __slots__ class attribute changes the storage of instance attributes from a dict to a tuple in each instance. 
+* For user-defined types, the `__slots__` class attribute changes the storage of instance attributes from a dict to a tuple in each instance. 
 * Keep in mind we are talking about space optimizations. If you are dealing with a few million objects and your machine has gigabytes of RAM, you should postpone such optimizations until they are actually warranted. Optimization is the altar where maintainability is sacrificed.
 
 #### Key search is very fast
-* dictionaries have significant memory overhead, but they provide fast access regardless of the size of the dictionary—as long as it fits in memory.
+* Dictionaries have significant memory overhead, but they provide fast access regardless of the size of the dictionary—as long as it fits in memory.
 
 #### Key ordering depends on insertion order
 * When a hash collision happens, the second key ends up in a position that it would not normally occupy if it had been inserted first. So, a `dict` built as `dict([(key1, value1), (key2, value2)])` compares equal to `dict([(key2, value2), (key1, value1)])`, but their key ordering may not be the same if the hashes of `key1` and `key2` collide.
