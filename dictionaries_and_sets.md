@@ -9,7 +9,7 @@
   * [Immutable Mappings](#immutable-mappings)
 * [Python Sets](#python-sets)
   * [Set Literals](#set-literals)
-  * [Set Comprehensions (setcomps)](#)
+  * [Set Comprehensions (setcomps)](#set-comprehensions-setcomps)
 * [Hash Table](#hash-table)
   * [Hash Buckets](#hash-buckets)
   * [Hash Function](#hash-function)
