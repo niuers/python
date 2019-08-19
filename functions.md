@@ -120,6 +120,33 @@ tag(**my_tag)
 * keyword-only arguments do not need to have a default value: they can be mandatory, like `b` in the preceding example.
 
 ### Retrieving Information About Parameters
+* Using the attributes on function objects is awkward
+  * Within a function object, the` __defaults__` attribute holds a tuple with the default values of positional and keyword arguments. 
+  * The defaults for keyword-only arguments appear in `__kwdefaults__`. The names of the arguments, however, are found within the `__code__` attribute, which is a reference to a code object with many attributes of its own.
+  
+* Use `inspect` module
+```
+>>> from inspect import signature
+>>> sig = signature(clip)
+```
+
+### Function Annotations
+* Python 3 provides syntax to attach metadata to the parameters of a function declaration and its return value.
+* No processing (no checks, enforcement, validation, or any other action is performed) is done with the annotations. They are merely stored in the `__annotations__` attribute of the function, a `dict`. In other words, annotations have no meaning to the Python interpreter.
+* The biggest impact of function annotations will probably not be dynamic settings such as Bobo, but in providing optional type information for static type checking in tools like IDEs and linters.
+
+
+## Packages for Functional Programming
+### THE `operator` MODULE
+* To save you the trouble of writing trivial anonymous functions like lambda a, b: a*b, the operator module provides function equivalents for dozens of arithmetic operators. e.g. `mul`
+* Another group of one-trick lambdas that operator replaces are functions to pick items from sequences or read attributes from objects: `itemgetter` and `attrgetter` actually build custom functions to do that.
+  * Because `itemgetter` uses the `[]` operator, it supports not only sequences but also mappings and any class that implements `__getitem__`.
+  
+
+
+
+### The `functools` Module
+
 
 
 
