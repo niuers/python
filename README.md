@@ -286,6 +286,12 @@ from time import perf_counter as pc
 t0 = pc(); floats /= 3; pc() - t0
 ```
 
+* Convert a number to binary
+```
+bin(-1)
+bin(7)
+```
+
 #### Others
 
 
