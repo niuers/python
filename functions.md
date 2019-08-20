@@ -53,6 +53,10 @@
     * First-class functions are heavily used in Standard Template Library.
       * `std::accumulate` is a higher order function and can accept first-class functions
 
+## Functional Programming in Python
+* Python is, by design, not a functional language—whatever that means. Python just borrows a few good ideas from functional languages.
+
+
 # Functions in Python
 
 ## Functions Treated Like an Object
@@ -62,7 +66,7 @@
 > A function that takes a function as argument or returns a function as the result is a higher-order function.
 
 ### Reducing Functions
-* `map` and `filter`: A `listcomp` or a `genexp` does the job of `map` and `filter` combined, but is more readable.
+* `map` and `filter`: A `listcomp` (coming from Haskell) or a `genexp` does the job of `map` and `filter` combined, but is more readable.
   * In Python 3, `map` and `filter` return `generators`—a form of `iterator`—so their direct substitute is now a `generator expression` (in Python 2, these functions returned lists, therefore their closest alternative is a `listcomp`).
 * `reduce`: It was demoted from a built-in in Python 2 to the `functools` module in Python 3.
   * Its most common use case, `summation`, is better served by the `sum` built-in. This is a big win in terms of readability and performance.
@@ -73,9 +77,12 @@
 
 ### Other High Order Functions
 * The `sorted`, `min`, `max` built-ins, and `functools.partial` functions.
+* Function decorators
 
 ## Anonymous Functions
 * The simple syntax of Python limits the body of `lambda` functions to be pure expressions. In other words, the body of a lambda cannot make assignments or use any other Python statement such as while, try, etc.
+* They don't have name, this makes them hard to debug.
+* Asynchronous programming in Python is more structured, perhaps because the limited lambda demands it. 
 
 ## The Seven Flavors of Callable Objects
 
@@ -142,10 +149,10 @@ tag(**my_tag)
 * Another group of one-trick lambdas that operator replaces are functions to pick items from sequences or read attributes from objects: `itemgetter` and `attrgetter` actually build custom functions to do that.
   * Because `itemgetter` uses the `[]` operator, it supports not only sequences but also mappings and any class that implements `__getitem__`.
   
-
-
-
 ### The `functools` Module
+* Freezing arguments with `functools.partial`
+* An impressive functools function is `lru_cache`, which does memoization—a form of automatic optimization that works by storing the results of function calls to avoid expensive recalculations.
+
 
 
 
