@@ -38,6 +38,7 @@
 * One of the best qualities of Python is its consistency.
 
 ## Python Characteristics
+
 * Python adheres to the idea that, if a language behaves a certain way in some contexts, it should ideally work similarly in all contexts. 
 * Python also follows the principle that a language should not have “convenient” shortcuts, special cases, ad hoc exceptions, overly subtle distinctions, or mysterious and tricky under-the-covers optimizations. A good language, like any other well-designed artifact, must balance such general principles with taste, common sense, and a high degree of practicality.
 
@@ -56,7 +57,7 @@
 #### Modular capability
 #### Comprehensive libraries
 #### Extensibility with respect to other languages
-#### Support most of the major programming paradigms
+#### Multiple Programming Paradigms
 * Procedural
 * Object-oriented
 * Functional Programming
