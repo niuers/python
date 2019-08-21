@@ -99,6 +99,7 @@
 
 ### Generators
 * Generators are a special class of functions that simplify the task of writing iterators. Regular functions compute a value and return it, but generators return an iterator that returns a stream of values.
+* The big difference between yield and a return statement is that on reaching a yield the generator’s state of execution is suspended and local variables are preserved. On the next call to the generator’s `__next__()` method, the function will resume executing.
 
 
 
