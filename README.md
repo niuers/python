@@ -305,6 +305,20 @@ bin(7)
 1. Fluent Python
 1. Python Cookbook
 1. The Art of the Metaobject Protocol (AMOP)
-#### Alex Martelli’s Python in a Nutshell 2E
-#### David Beazley’s Python Essential Reference 4E
-#### Expert Python Programming by Tarek Ziadé (Packt) is one of the best intermediate-level Python books in the market, and its final chapter, “Useful Design Patterns,” presents seven of the classic patterns from a Pythonic perspective.
+#### 
+Alex Martelli’s Python in a Nutshell 2E
+#### 
+David Beazley’s Python Essential Reference 4E
+#### 
+Expert Python Programming by Tarek Ziadé (Packt) is one of the best intermediate-level Python books in the market, and its final chapter, “Useful Design Patterns,” presents seven of the classic patterns from a Pythonic perspective.
+#### 
+Alex Martelli has given several talks about Python Design Patterns. There is a video of his EuroPython 2011 presentation and a set of slides on his personal website. I’ve found different slide decks and videos over the years, of varying lengths, so it is worthwhile to do a thorough search for his name with the words “Python Design Patterns.”
+#### 
+Around 2008, Bruce Eckel—author of the excellent Thinking in Java (Prentice Hall)—started a book titled Python 3 Patterns, Recipes and Idioms. It was to be written by a community of contributors led by Eckel, but six years later it’s still incomplete and apparently stalled (as I write this, the last change to the repository is two years old).
+#### In Design Patterns in Dynamic Languages (slides), Peter Norvig shows how first-class functions (and other dynamic features) make several of the original design patterns either simpler or unnecessary.
+
+####
+* That is the source of the often quoted design principles “Program to an interface, not an implementation” and “Favor object composition over class inheritance.”
+#### 
+As far as I know, Learning Python Design Patterns, by Gennadiy Zlobin (Packt), is the only book entirely devoted to patterns in Python—as of June 2014. But Zlobin’s work is quite short (100 pages) and covers eight of the original 23 design patterns.
+
