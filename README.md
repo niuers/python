@@ -32,6 +32,8 @@
 
 —Tim Peters
 
+## BDFL (Benevolent Dictator For Life): Guido van Rossum
+
 # Python Overview
 * One of the best qualities of Python is its consistency.
 
