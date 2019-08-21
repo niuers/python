@@ -12,9 +12,27 @@
 * [](#)
 
 
+# Functional Programming
 * A must read: [Functional Programming Howto](https://docs.python.org/3/howto/functional.html)
 
-# Functional Programming
+## Programming Paradigms
+
+* Procedural programs are lists of instructions that tell the computer what to do with the program’s input. 
+  * C, Pascal, and even Unix shells are procedural languages.
+  
+* Declarative languages: you write a specification that describes the problem to be solved, and the language implementation figures out how to perform the computation efficiently. 
+  * SQL is the declarative language: a SQL query describes the data set you want to retrieve, and the SQL engine decides whether to scan tables or use indexes, which subclauses should be performed first, etc.
+  
+* Object-oriented programs manipulate collections of objects. 
+  * Objects have internal state and support methods that query or modify this internal state in some way. 
+  * Smalltalk and Java are object-oriented languages. 
+  * C++ and Python are languages that support object-oriented programming, but don’t force the use of object-oriented features.
+
+* Functional programming decomposes a problem into a set of functions. 
+  * Ideally, functions only take inputs and produce outputs, and don’t have any internal state that affects the output produced for a given input.
+  * Well-known functional languages include the ML family (Standard ML, OCaml, and other variants) and Haskell.
+  * Python is, by design, *NOT* a functional language—whatever that means. Python just borrows a few good ideas from functional languages.
+
 
 ## Hallmarks of Functional Programming
 
@@ -26,7 +44,7 @@
 * Manipulation of Lists
 * Lazy Evaluation
 
-# First-Class Objects
+## First-Class Objects
 
 * “first-class object” is defined as a program entity that can be:
   * Created at runtime
@@ -54,9 +72,6 @@
     * Coroutines may come in C++20.
     * First-class functions are heavily used in Standard Template Library.
       * `std::accumulate` is a higher order function and can accept first-class functions
-
-## Functional Programming in Python
-* Python is, by design, not a functional language—whatever that means. Python just borrows a few good ideas from functional languages.
 
 
 # Functions in Python
