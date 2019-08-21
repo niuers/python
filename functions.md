@@ -36,6 +36,8 @@
 
 * Python 
   * Functions are first-class objects
+  * Modules in Python are also first-class objects, and the standard library provides several functions to handle them.
+    * globals(): Return a dictionary representing the current global symbol table. This is always the dictionary of the current module (inside a function or method, this is the module where it is defined, not the module from which it is called).
   * Integers, strings, and dictionaries are first-class objects in Python too
 
 * C++
@@ -153,6 +155,70 @@ tag(**my_tag)
 * Freezing arguments with `functools.partial`
 * An impressive functools function is `lru_cache`, which does memoization—a form of automatic optimization that works by storing the results of function calls to avoid expensive recalculations.
 
+## Design Patterns with Functions
+### General Idea
+* Although design patterns are language-independent, that does not mean every pattern applies to every language. 
+* In his 1996 presentation, “Design Patterns in Dynamic Languages”, Peter Norvig states that 16 out of the 23 patterns in the original Design Patterns book by Gamma et al. become either “invisible or simpler” in a dynamic language (slide 9).
+  * The message from Peter Norvig’s design patterns slides is that the Command and Strategy patterns—along with Template Method and Visitor—can be made simpler or even “invisible” with first-class functions, at least for some applications of these patterns.
+* The general idea is: you can replace instances of some participant class in these patterns with simple functions, reducing a lot of boilerplate code.
+
+### Strategy Pattern
+> It defines a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.
+
+#### Participants
+* Context
+  * Provides a service by delegating some computation to interchangeable components that implement alternative algorithms. 
+  * In the ecommerce example, the context is an Order, which is configured to apply a promotional discount according to one of several algorithms.
+* Strategy
+  * The interface common to the components that implement the different algorithms. 
+  * In our example, this role is played by an abstract class called Promotion (abstract class with Promotion() method)
+* Concrete Strategy
+  * One of the concrete subclasses of Strategy. 
+  * FidelityPromo, BulkPromo, and LargeOrderPromo are the three concrete strategies implemented with Promotion() methods.
+
+#### Refactoring with Functions
+* When there's no internal state in Strategy classes (so the Strategy classes only deal with data from the context), we can replace the concrete strategies with simple functions (using Context as input) and remove the *Strategy* abstract class.
+* With complex concrete strategies holding internal state, it may require all the pieces of the Strategy and Flyweight design patterns combined. 
+  * Closures can also be used to store states between function calls.
+
+
+#### Refactoring with Modules
+* You can also refactor with modules using `global()` to implement a 'meta-strategy' that can dynamically choose the best promotion.
+```
+promos = [globals()[name] for name in globals()
+            if name.endswith('_promo')
+            and name != 'best_promo'] 
+```
+
+* Use `inspect` module
+  * The function inspect.getmembers returns the attributes of an object—in this case, the promotions module—optionally filtered by a predicate (a boolean function). We use inspect.isfunction to get only the functions from the module.
+
+```
+promos = [func for name, func in
+                inspect.getmembers(promotions, inspect.isfunction)]
+```
+
+#### Use Decorator
+* A more explicit alternative for dynamically collecting promotional discount functions would be to use a simple decorator.
+
+### Command Pattern
+* The goal of Command is to decouple an object that invokes an operation (the Invoker) from the provider object that implements it (the Receiver). 
+  * In the example from Design Patterns, each invoker is a menu item in a graphical application, and the receivers are the document being edited or the application itself.
+* The idea is to put a Command object between the two, implementing an interface with a single method, `execute`, which calls some method in the Receiver to perform the desired operation. 
+  * That way the Invoker does not need to know the interface of the Receiver, and different receivers can be adapted through different Command subclasses. 
+  * The Invoker is configured with a concrete command and calls its execute method to operate it.
+  * You can have a `MacroCommand` that stores a sequence of commands; its execute() method calls the same method in each command stored.
+* Quoting from Gamma et al., “Commands are an object-oriented replacement for callbacks.” The question is: do we need an object-oriented replacement for callbacks? Sometimes yes, but not always.
+
+#### Refactoring with Functions
+* Instead of giving the Invoker a Command instance, we can simply give it a function. 
+* Instead of calling command.execute(), the Invoker can just call command(). 
+  * The `MacroCommand` can be implemented with a class implementing `__call__`. Instances of MacroCommand would be callables, each holding a list of functions for future invocation. 
+
+* In many cases, functions or callable objects provide a more natural way of implementing callbacks in Python than mimicking the Strategy or the Command patterns. 
+
+### Visitor Pattern
+* “Recipe 8.21. Implementing the Visitor Pattern,” in the Python Cookbook, Third Edition (O’Reilly), by David Beazley and Brian K. Jones, presents an elegant implementation of the Visitor pattern in which a NodeVisitor class handles methods as first-class objects.
 
 
 
