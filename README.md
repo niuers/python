@@ -57,7 +57,10 @@
 #### Support most of the major programming paradigms
 * Procedural
 * Object-oriented
-* To a lesser extent, functional.
+* Functional Programming
+  * Python is, by design, [not a functional language](http://python-history.blogspot.com/2009/04/origins-of-pythons-functional-features.html)—whatever that means. Python just borrows a few good ideas from functional languages. (Guido van Rossum)
+  * Python still lacks certain features found in “real” functional programming languages. 
+    * Python does not perform certain kinds of optimizations (e.g., tail recursion). In general, because Python's extremely dynamic nature, it is impossible to do the kind of compile-time optimization known from functional languages like Haskell or ML. (Guido van Rossum)
 
 ## Python Implementations
 
