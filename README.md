@@ -307,3 +307,4 @@ bin(7)
 1. The Art of the Metaobject Protocol (AMOP)
 #### Alex Martelli’s Python in a Nutshell 2E
 #### David Beazley’s Python Essential Reference 4E
+#### Expert Python Programming by Tarek Ziadé (Packt) is one of the best intermediate-level Python books in the market, and its final chapter, “Useful Design Patterns,” presents seven of the classic patterns from a Pythonic perspective.
