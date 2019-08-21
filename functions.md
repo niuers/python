@@ -33,6 +33,19 @@
   * Well-known functional languages include the ML family (Standard ML, OCaml, and other variants) and Haskell.
   * Python is, by design, *NOT* a functional language—whatever that means. Python just borrows a few good ideas from functional languages.
 
+## Theoretical and Practical Advantages to the Functional Style
+### Formal provability
+* A theoretical benefit is that it’s easier to construct a mathematical proof that a functional program is correct.
+* Functional programming’s avoidance of assignments arose because assignments are difficult to handle with this technique; assignments can break invariants that were true before the assignment without producing any new invariants that can be propagated onward.
+
+### Modularity
+* It forces you to break apart your problem into small pieces.
+
+### Composability
+* Often you’ll assemble new programs by arranging existing functions in a new configuration and writing a few functions specialized for the current task.
+
+### Ease of debugging and testing
+* Debugging is simplified because functions are generally small and clearly specified.
 
 ## Hallmarks of Functional Programming
 
@@ -40,6 +53,9 @@
 * Higher Order Functions
 * Immutable Data
 * Pure Functions
+  * Pure functions are functions that have no side effects.
+  * Functional programming tries to avoid side effects, meaning not using data structures that get updated as a program runs; every function’s output must only depend on its input.
+
 * Recursion
 * Manipulation of Lists
 * Lazy Evaluation
@@ -72,6 +88,18 @@
     * Coroutines may come in C++20.
     * First-class functions are heavily used in Standard Template Library.
       * `std::accumulate` is a higher order function and can accept first-class functions
+
+## Python Features Important to Functional Programming
+### Iterators
+* An iterator is an object representing a stream of data; this object returns the data one element at a time.
+* Note that you can only go forward in an iterator; there’s no way to get the previous element, reset the iterator, or make a copy of it.
+* List comprehensions (return list) and generator expressions (return iterator) are common operations.
+  * Generator expressions return an iterator that computes the values as necessary, not needing to materialize all the values at once. This means that list comprehensions aren’t useful if you’re working with iterators that return an infinite stream or a very large amount of data. Generator expressions are preferable in these situations.
+  * Generator expressions always have to be written inside parentheses, but the parentheses signalling a function call also count.
+
+### Generators
+* Generators are a special class of functions that simplify the task of writing iterators. Regular functions compute a value and return it, but generators return an iterator that returns a stream of values.
+
 
 
 # Functions in Python
