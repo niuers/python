@@ -329,3 +329,6 @@ Around 2008, Bruce Eckel—author of the excellent Thinking in Java (Prentice Ha
 #### 
 As far as I know, Learning Python Design Patterns, by Gennadiy Zlobin (Packt), is the only book entirely devoted to patterns in Python—as of June 2014. But Zlobin’s work is quite short (100 pages) and covers eight of the original 23 design patterns.
 
+
+# CPython
+* The CPython VM that runs the bytecode is a stack machine, so the operations LOAD and POP refer to the stack.
