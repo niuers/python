@@ -1,5 +1,7 @@
 # Table of Contents
 * [Functional Programming](#functional-programming)
+  * [Programming Paradigms](#programming-paradigms)
+  * [Theoretical and Practical Advantages to the Functional Style](#theoretical-and-practical-advantages-to-the-functional-style)
   * [Hallmarks of Functional Programming](#hallmarks-of-functional-programming)
 * [First-Class Objects](#first-class-objects)
 * [Functions in Python](#functions-in-python)
@@ -100,7 +102,6 @@
 ### Generators
 * Generators are a special class of functions that simplify the task of writing iterators. Regular functions compute a value and return it, but generators return an iterator that returns a stream of values.
 * The big difference between yield and a return statement is that on reaching a yield the generator’s state of execution is suspended and local variables are preserved. On the next call to the generator’s `__next__()` method, the function will resume executing.
-
 
 
 # Functions in Python
@@ -263,6 +264,10 @@ promos = [func for name, func in
 
 ### Visitor Pattern
 * “Recipe 8.21. Implementing the Visitor Pattern,” in the Python Cookbook, Third Edition (O’Reilly), by David Beazley and Brian K. Jones, presents an elegant implementation of the Visitor pattern in which a NodeVisitor class handles methods as first-class objects.
+
+# Decorators and Closures
+* A decorator is a callable that takes another function as argument (the decorated function). The decorator may perform some processing with the decorated function, and returns it or replaces it with another function or callable object.
+
 
 
 
