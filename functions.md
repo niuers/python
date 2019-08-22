@@ -266,7 +266,61 @@ promos = [func for name, func in
 * “Recipe 8.21. Implementing the Visitor Pattern,” in the Python Cookbook, Third Edition (O’Reilly), by David Beazley and Brian K. Jones, presents an elegant implementation of the Visitor pattern in which a NodeVisitor class handles methods as first-class objects.
 
 # Decorators and Closures
+
 * A decorator is a callable that takes another function as argument (the decorated function). The decorator may perform some processing with the decorated function, and returns it or replaces it with another function or callable object.
+* Code that uses inner functions almost always depends on closures to operate correctly.
+
+## When Python Executes Decorators
+* They are executed immediately when a module is loaded. That is they run right after the decorated function is defined. That is usually at import time (i.e., when a module is loaded by Python).
+* But the decorated functions only run when they are explicitly invoked. This highlights the difference between what Pythonistas call **import time** and **runtime**.
+
+## Decorator-Enhanced Strategy Pattern
+* One can use decorator to register `Promotion` functions in previous Strategy Pattern example.
+
+## Variable Scope Rules
+* Python does not require you to declare variables, but assumes that a variable **assigned** a value in the body of a function is local. 
+```
+>>> b = 6
+>>> def f2(a):
+...     print(a)
+...     print(b)
+...     b = 9
+...
+>>> f2(3)
+3
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 3, in f2
+UnboundLocalError: local variable 'b' referenced before assignment
+```
+  * This is much better than the behavior of JavaScript, which does not require variable declarations either, but if you do forget to declare that a variable is local (with var), you may clobber a global variable without knowing.
+* If we want the interpreter to treat a variable as a *global variable* in spite of the assignment within the function, we use the global declaration:
+```
+>>> b = 6
+>>> def f3(a):
+...     global b
+...     print(a)
+...     print(b)
+...     b = 9
+...
+>>> f3(3)
+3
+6
+>>> b
+9
+
+a = 3
+b = 8
+b = 30
+>>> b
+30
+```
+
+
+
+
+
+
 
 
 
