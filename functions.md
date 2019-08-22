@@ -294,6 +294,19 @@ Traceback (most recent call last):
 UnboundLocalError: local variable 'b' referenced before assignment
 ```
   * This is much better than the behavior of JavaScript, which does not require variable declarations either, but if you do forget to declare that a variable is local (with var), you may clobber a global variable without knowing.
+* If a variable is referrenced without any assignment in the function body, it's treated as a global variable.
+```
+>>> def f1(a):
+...     print(a)
+...     print(b)
+...
+>>> f1(3)
+3
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 3, in f1
+NameError: global name 'b' is not defined
+```
 * If we want the interpreter to treat a variable as a *global variable* in spite of the assignment within the function, we use the global declaration:
 ```
 >>> b = 6
