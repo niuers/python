@@ -274,7 +274,7 @@ promos = [func for name, func in
 * They are executed immediately when a module is loaded. That is they run right after the decorated function is defined. That is usually at import time (i.e., when a module is loaded by Python).
 * But the decorated functions only run when they are explicitly invoked. This highlights the difference between what Pythonistas call **import time** and **runtime**.
 
-## Decorator-Enhanced Strategy Pattern
+### Decorator-Enhanced Strategy Pattern
 * One can use decorator to register `Promotion` functions in previous Strategy Pattern example.
 
 ## Variable Scope Rules
@@ -328,6 +328,68 @@ b = 30
 >>> b
 30
 ```
+
+## Closures
+* A closure is a function with an extended scope that encompasses nonglobal variables referenced in the body of the function but not defined there. It does not matter whether the function is anonymous or not; what matters is that it can access nonglobal variables that are defined outside of its body.
+  * Free Variable: a variable that is not bound in the local scope.
+  * A closure is a function that retains the bindings of the free variables (`series` in the example) that exist when the function is defined, so that they can be used later when the function is invoked and the defining scope is no longer available.
+  
+* In following example, line #3 - #7 forms a closure, note this includes the declaration for `series`.
+  * Python keeps the names of local and free variables in the `__code__` attribute that represents the compiled body of the function.
+  * Each item in `avg.__closure__` corresponds to a name in `avg.__code__.co_freevars`. These items are `cells`, and they have an attribute called `cell_contents` where the actual value can be found.
+
+```
+def make_averager():                              #1
+                                                  #2
+    series = []  # series is a free variable      #3
+    def averager(new_value):                      #4
+        series.append(new_value)                  #5
+        total = sum(series)                       #6
+        return total/len(series)                  #7
+                                                  #8
+    return averager                               #9
+
+>>> avg = make_averager()
+>>> avg(10)
+10.0
+>>> avg(11)
+10.5
+>>> avg(12)
+11.0
+
+>>> avg.__code__.co_varnames
+('new_value', 'total')
+>>> avg.__code__.co_freevars
+('series',)
+>>> avg.__code__.co_freevars
+('series',)
+>>> avg.__closure__
+(<cell at 0x107a44f78: list object at 0x107a91a48>,)
+>>> avg.__closure__[0].cell_contents
+[10, 11, 12]
+```
+
+* Note that the only situation in which a function may need to deal with external variables that are nonglobal is when it is nested in another function.
+
+### The nonlocal Declaration
+* In the inner function, if you try to assign to or update a free variable, which is of immutable type (like numbers, strings, tuples, etc.), then you are implicitly creating a local variable. It is no longer a free variable, and therefore it is not saved in the closure.
+* The *nonlocal declaration* lets you flag a variable as a free variable even when it is assigned a new value within the function. If a new value is assigned to a nonlocal variable, the binding stored in the closure is changed. 
+```
+def make_averager():
+    count = 0
+    total = 0
+
+    def averager(new_value):
+        nonlocal count, total   #without this declaration, following += will throw out UnboundLocalError error
+        count += 1
+        total += new_value
+        return total / count
+
+    return averager
+
+```
+
+
 
 
 
