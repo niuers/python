@@ -269,6 +269,7 @@ promos = [func for name, func in
 
 * A decorator is a callable that takes another function as argument (the decorated function). The decorator may perform some processing with the decorated function, and returns it or replaces it with another function or callable object.
 * Code that uses inner functions almost always depends on closures to operate correctly.
+* Decorators can be stacked.
 
 ## When Python Executes Decorators
 * They are executed immediately when a module is loaded. That is they run right after the decorated function is defined. That is usually at import time (i.e., when a module is loaded by Python).
@@ -390,6 +391,70 @@ def make_averager():
 ```
 
 ## Decorators in the Standard Library
+* Python has three built-in functions that are designed to decorate methods: property, classmethod, and staticmethod
+* Another frequently seen decorator is functools.wraps, a helper for building well-behaved decorators.
+
+### MEMOIZATION WITH FUNCTOOLS.LRU_CACHE
+> Memoization: an optimization technique that works by saving the results of previous invocations of an expensive function, avoiding repeat computations on previously used arguments. 
+
+* `functools.lru_cache` implements memoization. 
+  * The letters LRU stand for Least Recently Used, meaning that the growth of the cache is limited by discarding the entries that have not been read for a while.
+
+* `lru_cache` must be invoked as a regular function, `@functools.lru_cache()`, because it accepts configuration parameters.
+  * `functools.lru_cache(maxsize=128, typed=False)`
+  * The `maxsize` argument determines how many call results are stored. After the cache is full, older results are discarded to make room. For optimal performance, maxsize should be a power of 2. 
+  * The `typed` argument, if set to True, stores results of different argument types separately, i.e., distinguishing between float and integer arguments that are normally considered equal, like 1 and 1.0. 
+  * By the way, because `lru_cache` uses a dict to store the results, and the keys are made from the positional and keyword arguments used in the calls, all the arguments taken by the decorated function must be hashable.
+
+* Applications
+  * Make silly recursive algorithms viable
+  * `lru_cache` really shines in applications that need to fetch information from the Web.
+
+### GENERIC FUNCTIONS WITH SINGLE DISPATCH
+* Suppose we want to write a program `htmlize` to generate HTML displays for different types of Python objects. 
+* Because we don’t have method or function overloading in Python, we can’t create variations of `htmlize` with different signatures for each data type we want to handle differently. 
+* A common solution in Python would be to turn `htmlize` into a *dispatch function*, with a chain of `if/elif/elif` calling specialized functions like `htmlize_str`, `htmlize_int`, etc. 
+* This is not extensible by users of our module, and is unwieldy: over time, the `htmlize` dispatcher would become too big, and the coupling between it and the specialized functions would be very tight.
+
+* `functools.singledispatch` decorator allows each module to contribute to the overall solution, and lets you easily provide a specialized function even for classes that you can’t edit. 
+  * If you decorate a plain function with `@singledispatch`, it becomes a generic function: a group of functions to perform the same operation in different ways, depending on the type of the first argument (This is what is meant by the term single-dispatch. If more arguments were used to select the specific functions, we’d have multiple-dispatch.).
+  * When possible, register the specialized functions to handle `ABC`s (abstract classes) such as `numbers.Integral` and `abc.MutableSequence` instead of concrete implementations like `int` and `list`. This allows your code to support a greater variety of compatible types. For example, a Python extension can provide alternatives to the `int` type with fixed bit lengths as subclasses of `numbers.Integral`.
+  * Using ABCs for type checking allows your code to support existing or future classes that are either actual or virtual subclasses of those ABCs.
+
+* A notable quality of the singledispatch mechanism is that you can register specialized functions anywhere in the system, in any module.
+* `@singledispatch` is not designed to bring *Java-style* *method overloading* to Python. 
+  * A single class with many overloaded variations of a method is better than a single function with a lengthy stretch of `if/elif/elif/elif` blocks. 
+  * But both solutions are flawed because they concentrate too much responsibility in a single code unit—the class or the function. 
+  * The advantage of `@singledispath` is supporting *modular extension*: each module can register a specialized function for each type it supports.
+  
+## Parameterized Decorators
+* When parsing a decorator in source code, Python takes the decorated function and passes it as the first argument to the decorator function. 
+* To make a decorator accept other arguments: make a **decorator factory** that takes those arguments and returns a decorator, which is then applied to the function to be decorated.
+* Graham Dumpleton and Lennart Regebro argue that decorators are best coded as classes implementing `__call__`, and not as functions.
+* Parameterized decorators almost aways involve at least two nested functions, maybe more if you want to use @functools.wraps to produce a decorator that provides better support for more advanced techniques. One such technique is stacked decorators.
+
+
+# References
+* Graham Dumpleton has [a series of in-depth blog posts](https://github.com/GrahamDumpleton/wrapt/blob/develop/blog/README.md) about techniques for implementing well-behaved decorators, starting with “How You Implemented Your Python Decorator is Wrong”. His deep expertise in this matter is also nicely packaged in the wrapt module he wrote to simplify the implementation of decorators and dynamic function wrappers, which support introspection and behave correctly when further decorated, when applied to methods and when used as descriptors.
+
+* [PEP 443](https://www.python.org/dev/peps/pep-0443/) provides the rationale and a detailed description of the single-dispatch generic functions’ facility. An old (March 2005) blog post by Guido van Rossum, [“Five-Minute Multimethods in Python”](https://www.artima.com/weblogs/viewpost.jsp?thread=101605), walks through an implementation of generic functions (a.k.a. multimethods) using decorators. His code supports multiple-dispatch (i.e., dispatch based on more than one positional argument). Guido’s multimethods code is interesting, but it’s a didactic example. For a modern, production-ready implementation of multiple-dispatch generic functions, check out Reg by Martijn Faassen—author of the model-driven and REST-savvy Morepath web framework.
+
+* [“Closures in Python”](http://effbot.org/zone/closure.htm) is a short blog post by Fredrik Lundh that explains the terminology of closures.
+
+* PEP 3104 — Access to Names in Outer Scopes describes the introduction of the nonlocal declaration to allow rebinding of names that are neither local nor global. It also includes an excellent overview of how this issue is resolved in other dynamic languages (Perl, Ruby, JavaScript, etc.) and the pros and cons of the design options available to Python.
+
+* On a more theoretical level, PEP 227 — Statically Nested Scopes documents the introduction of lexical scoping as an option in Python 2.1 and as a standard in Python 2.2, explaining the rationale and design choices for the implementation of closures in Python.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
