@@ -268,8 +268,19 @@ promos = [func for name, func in
 # Decorators and Closures
 
 * A decorator is a callable that takes another function as argument (the decorated function). The decorator may perform some processing with the decorated function, and returns it or replaces it with another function or callable object.
+* Python function decorators fit the general description of Decorator given by Gamma et al. in Design Patterns: “Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality.”
+* At the implementation level, Python decorators do not resemble the classic Decorator design pattern, but an analogy can be made.
 * Code that uses inner functions almost always depends on closures to operate correctly.
 * Decorators can be stacked.
+
+## Python Decorators and Decorator Pattern
+* In the design pattern, Decorator and Component are abstract classes. An instance of a concrete decorator wraps an instance of a concrete component in order to add behaviors to it. Quoting from Design Patterns:
+> The decorator conforms to the interface of the component it decorates so that its presence is transparent to the component’s clients. The decorator forwards requests to the component and may perform additional actions (such as drawing a border) before or after forwarding. Transparency lets you nest decorators recursively, thereby allowing an unlimited number of added responsibilities.” (p. 175)
+
+* In Python, the decorator function plays the role of a concrete Decorator subclass, and the inner function it returns is a decorator instance. The returned function wraps the function to be decorated, which is analogous to the component in the design pattern. The returned function is transparent because it conforms to the interface of the component by accepting the same arguments. It forwards calls to the component and may perform additional actions either before or after it. Borrowing from the previous citation, we can adapt the last sentence to say that “Transparency lets you nest decorators recursively, thereby allowing an unlimited number of added behaviors.” That is what enable stacked decorators to work.
+
+* Note that I am not suggesting that function decorators should be used to implement the Decorator pattern in Python programs. Although this can be done in specific situations, in general the Decorator pattern is best implemented with classes to represent the Decorator and the components it will wrap.
+
 
 ## When Python Executes Decorators
 * They are executed immediately when a module is loaded. That is they run right after the decorated function is defined. That is usually at import time (i.e., when a module is loaded by Python).
@@ -372,6 +383,15 @@ def make_averager():                              #1
 
 * Note that the only situation in which a function may need to deal with external variables that are nonglobal is when it is nested in another function.
 
+* The designer of any language with first-class functions faces this issue: being first-class objects, functions are defined in a certain scope but may be invoked in other scopes. The question is: how to evaluate the free variables? The first and simplest answer is “dynamic scope.” This means that free variables are evaluated by looking into the environment where the function is invoked.
+  * Functions should be black boxes, with their implementation hidden from users. But with dynamic scope, if a function uses free variables, the programmer has to know its internals to set up an environment where it works correctly.
+  * On the other hand, dynamic scope is easier to implement, which is probably why it was the path taken by John McCarthy when he created Lisp, the first language to have first-class functions. Paul Graham’s article [“The Roots of Lisp”](http://www.paulgraham.com/rootsoflisp.html) is an accessible explanation of John McCarthy’s original paper about the Lisp language: [“Recursive Functions of Symbolic Expressions and Their Computation by Machine, Part I”](http://www-formal.stanford.edu/jmc/recursive/recursive.html). McCarthy’s paper is a masterpiece as great as Beethoven’s 9th Symphony. Paul Graham translated it for the rest of us, from mathematics to English and running code.
+  * It’s an eloquent testimony to the dangers of dynamic scope that even the very first example of higher-order Lisp functions was broken because of it. It may be that McCarthy was not fully aware of the implications of dynamic scope in 1960. Dynamic scope remained in Lisp implementations for a surprisingly long time—until Sussman and Steele developed Scheme in 1975. Lexical scope does not complicate the definition of eval very much, but it may make compilers harder to write.
+  
+* Today, **lexical scope** is the norm: free variables are evaluated considering the environment where the function is defined. Lexical scope complicates the implementation of languages with first-class functions, because it requires the support of closures. On the other hand, lexical scope makes source code easier to read. Most languages invented since Algol have lexical scope.
+
+
+
 ### The nonlocal Declaration
 * In the inner function, if you try to assign to or update a free variable, which is of immutable type (like numbers, strings, tuples, etc.), then you are implicitly creating a local variable. It is no longer a free variable, and therefore it is not saved in the closure.
 * The *nonlocal declaration* lets you flag a variable as a free variable even when it is assigned a new value within the function. If a new value is assigned to a nonlocal variable, the binding stored in the closure is changed. 
@@ -445,29 +465,3 @@ def make_averager():
 
 * On a more theoretical level, PEP 227 — Statically Nested Scopes documents the introduction of lexical scoping as an option in Python 2.1 and as a standard in Python 2.2, explaining the rationale and design choices for the implementation of closures in Python.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
