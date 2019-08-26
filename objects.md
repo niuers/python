@@ -17,7 +17,9 @@
 
 # Object Identity, Equality, and Aliasing
 
-* Every object has an *identity*, a *type* and a *value*. 
+* Every object has an *identity*, a *type* and a *value*.
+* Because variables are mere labels, nothing prevents an object from having several labels assigned to it. When that happens, you have **aliasing**.
+
 
 ## Object Identity
 
@@ -42,22 +44,35 @@ x is None
 * In contrast, `a == b` is syntactic sugar for `a.__eq__(b)`. The `__eq__` method inherited from object compares object IDs, so it produces the same result as `is`. 
   * But most built-in types override `__eq__` with more meaningful implementations that actually take into account the values of the object attributes. *Equality* may involve a lot of processing—for example, when comparing large collections or deeply nested structures.
 
-### THE RELATIVE IMMUTABILITY OF TUPLES
+### The Relative Immutability of Tuples
 * A surprising trait of tuples is revealed: they are immutable but their values may change.
   * If the referenced items are mutable, they may change even if the tuple itself does not. 
   * In other words, the immutability of tuples really refers to the physical contents of the tuple data structure (i.e., the references it holds), and does not extend to the referenced objects.
   * What can never change in a tuple is the identity of the items it contains.
   * It's the reason about the [A += Assignment Puzzle](https://github.com/niuers/python/blob/master/python_sequences.md#a--assignment-puzzler)
-  * It’s also the reason why some tuples are unhashable
-
-
-
-* Because variables are mere labels, nothing prevents an object from having several labels assigned to it. When that happens, you have aliasing.
-
-
-
+  * It’s also the reason why some [tuples are unhashable](https://github.com/niuers/python/blob/master/dictionaries_and_sets.md#hashable-objects)
+  
 
 # Shallow and Deep Copies
+* The distinction between equality and identity has further implications when you need to copy an object. 
+* A *copy* is an equal object with a different ID. But if an object contains other objects, should the copy also duplicate the inner objects, or is it OK to share them? There’s no single answer. 
+
+## Copies Are Shallow by Default
+* The easiest way to copy a list (or most built-in mutable collections) is to use the built-in constructor for the type itself.
+```
+l2 = list(l1)
+
+#For lists and other mutable sequences, the shortcut below also makes a copy
+
+l2 = l1[:] 
+```
+
+* However, using the constructor or `[:]` produces a shallow copy (i.e., the outermost container is duplicated, but the copy is filled with references to the same items held by the original container). This saves memory and causes no problems if all the items are immutable. But if there are mutable items, this may lead to unpleasant surprises.
+
+## Deep and Shallow Copies of Arbitrary Objects
+
+
+
 
 # References and Functions
 
