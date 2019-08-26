@@ -110,6 +110,17 @@ class HauntedBus:
 * When you are coding a function that receives a mutable parameter, you should carefully consider whether the caller expects the argument passed to be changed.
 * Unless a method is explicitly intended to mutate an object received as argument, you should think twice before aliasing the argument object by simply assigning it to an instance variable in your class. If in doubt, make a copy. Your clients will often be happier.
 
+* If two variables refer to immutable objects that have equal values (`a == b` is True), in practice it rarely matters if they refer to copies or are aliases referring to the same object because the value of an immutable object does not change, with one exception. 
+  * The exception is immutable collections such as `tuples` and `frozensets`: if an immutable collection holds references to mutable items, then its value may actually change when the value of a mutable item changes. In practice, this scenario is not so common. What never changes in an immutable collection are the identities of the objects within.
+
+* The fact that variables hold references has many practical consequences in Python programming:
+  * Simple assignment does not create copies.
+  * Augmented assignment with += or *= creates new objects if the lefthand variable is bound to an immutable object, but may modify a mutable object in place.
+  * Assigning a new value to an existing variable does not change the object previously bound to it. 
+  > This is called a rebinding: the variable is now bound to a different object. If that variable was the last reference to the previous object, that object will be garbage collected.
+  * Function parameters are passed as aliases, which means the function may change any mutable object received as an argument. There is no way to prevent this, except making local copies or using immutable objects (e.g., passing a tuple instead of a list).
+  * Using mutable objects as default values for function parameters is dangerous because if the parameters are changed in place, then the default is changed, affecting every future call that relies on the default.
+
 
 # Garbage Collection
 * Objects in Python are never explicitly destroyed; however, when they become unreachable they may be garbage-collected.
