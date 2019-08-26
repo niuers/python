@@ -9,6 +9,7 @@
   * [Slicing](#slicing)
   * [Using + and * with Sequences](#using--and--with-sequences)
   * [Augmented Assignment (`+=` or `*=`) with Sequences](#augmented-assignment--or--with-sequences)
+    * [A += Assignment Puzzler](#a-assignment-puzzler)
   * [`list.sort` and the `sorted` Built-In Function](#listsort-and-the-sorted-built-in-function)
 
 # Classifications
@@ -102,10 +103,10 @@ list1, list2 = zip(*sorted(zip(list1, list2)))
   ```
 ### collections.namedtuple
 * The collections.namedtuple function is a factory that produces subclasses of tuple enhanced with field names and a class name—which helps debugging.
-* Instances of a class that you build with namedtuple take exactly the same amount of memory as tuples because the field names are stored in the class. They use less memory than a regular object because they don’t store attributes in a per-instance __dict__.
+* Instances of a class that you build with namedtuple take exactly the same amount of memory as tuples because the field names are stored in the class. They use less memory than a regular object because they don’t store attributes in a per-instance `__dict__`.
 
 ## TUPLES AS IMMUTABLE LISTS
-* tuple supports all list methods that do not involve adding or removing items, with one exception—tuple lacks the __reversed__ method. However, that is just for optimization; reversed(my_tuple) works without it.
+* tuple supports all list methods that do not involve adding or removing items, with one exception—tuple lacks the `__reversed__` method. However, that is just for optimization; reversed(my_tuple) works without it.
 
 # When a List Is Not the Answer
 * If you need to store 10 million floating-point values, an `array` is much more efficient, because an `array` does not actually hold full-fledged **float objects**, but only the packed bytes representing their machine values—just like an array in the C language. 
@@ -192,7 +193,8 @@ TypeError: can only assign an iterable
 * In general, for mutable sequences, it is a good bet that `__iadd__` is implemented and that `+=` happens in place. For immutable sequences, clearly there is no way for that to happen.
 * Repeated concatenation of immutable sequences is inefficient, because instead of just appending new items, the interpreter has to copy the whole target sequence to create a new one with the new items concatenated.
   * `str` is an exception to this description. Because string building with `+=` in loops is so common in the wild, `CPython` is optimized for this use case. `str` instances are allocated in memory with room to spare, so that concatenation does not require copying the whole string every time.
-  
+
+###  A += Assignment Puzzler
 * An odd behavior with Tuples of mutable sequence. The following tuple with `+=` operation both throw error and being modified.
 ```
 >>> t = (1, 2, [30, 40])
