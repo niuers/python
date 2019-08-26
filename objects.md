@@ -20,12 +20,12 @@
 
 # Object Identity, Equality, and Aliasing
 
-* Every object has an *identity*, a *type* and a *value*.
-* Because variables are mere labels, nothing prevents an object from having several labels assigned to it. When that happens, you have **aliasing**.
-
-
 ## Object Identity
 
+* Every object has an *identity*, a *type* and a *value*.
+  * Only the value of an object changes over time. Actually the type of an object may be changed by merely assigning a different class to its `__class__` attribute, but that is pure evil.
+  
+* Because variables are mere labels, nothing prevents an object from having several labels assigned to it. When that happens, you have **aliasing**.
 * An object’s *identity* is guaranteed to be a **unique numeric label**, and it will **never change** during the life of the object.
   * You may think of it as the object’s address in memory.
   * The `is` operator compares the identity of two objects; the `id()` function returns an integer representing its identity.
