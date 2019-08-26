@@ -9,7 +9,7 @@
   * [Slicing](#slicing)
   * [Using + and * with Sequences](#using--and--with-sequences)
   * [Augmented Assignment (`+=` or `*=`) with Sequences](#augmented-assignment--or--with-sequences)
-    * [A += Assignment Puzzler](#a-assignment-puzzler)
+    * [A += Assignment Puzzler](#a--assignment-puzzler)
   * [`list.sort` and the `sorted` Built-In Function](#listsort-and-the-sorted-built-in-function)
 
 # Classifications
