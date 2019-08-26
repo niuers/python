@@ -47,6 +47,7 @@ x is None
   * If the referenced items are mutable, they may change even if the tuple itself does not. 
   * In other words, the immutability of tuples really refers to the physical contents of the tuple data structure (i.e., the references it holds), and does not extend to the referenced objects.
   * What can never change in a tuple is the identity of the items it contains.
+  * It's the reason about the [A += Assignment Puzzle](https://github.com/niuers/python/blob/master/python_sequences.md#a--assignment-puzzler)
   * It’s also the reason why some tuples are unhashable
 
 
