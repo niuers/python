@@ -8,6 +8,7 @@
 * [Function Parameters as References](#function-parameters-as-references)
 * [Garbage Collection](#garbage-collection)
 * [User-Defined Object](#user-defined-object)
+* [Sequence Hacking, Hashing, and Slicing](#sequence-hacking-hashing-and-slicing)
 
 # Object References
 ## Variables Are Labels, Not Boxes
@@ -357,25 +358,4 @@ True
 * If you are curious about it, A.M. Kuchling’s What’s New in Python 2.5 has a short explanation, and PEP 357 — Allowing Any Object to be Used for Slicing details the need for __index__, from the perspective of an implementor of a C-extension, Travis Oliphant, the lead author of NumPy.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Sequence Hacking, Hashing, and Slicing
