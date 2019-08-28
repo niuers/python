@@ -276,9 +276,11 @@ True
 * Thanks to the Python data model, your user-defined types can behave as naturally as the built-in types. And this can be accomplished without inheritance, in the spirit of duck typing: you just implement the methods needed for your objects to behave as expected.
 
 ## Object Representations
+* An early realization of the need for distinct string representations for objects appeared in [Smalltalk](http://esug.org/data/HistoricalDocuments/TheSmalltalkReport/ST07/04wo.pdf).
+  * For example, To a programmer, one of an object’s most important properties is its class.
 * repr(): Return a string representing the object as the developer wants to see it.
 * str(): Return a string representing the object as the user wants to see it.
-* An early realization of the need for distinct string representations for objects appeared in Smalltalk.
+
 ### classmethod Versus staticmethod
 * The `classmethod` is used to define a method that operates on the class and not on instances. `classmethod` changes the way the method is called, so it receives the class itself as the first argument (usually named `cls`), instead of an instance. Its most common use is for alternative constructors.
   * No matter how you invoke it, class method receives the class as the first argument.
