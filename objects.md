@@ -7,6 +7,7 @@
   * [Deep and Shallow Copies of Arbitrary Objects](#deep-and-shallow-copies-of-arbitrary-objects)
 * [Function Parameters as References](#function-parameters-as-references)
 * [Garbage Collection](#garbage-collection)
+* [User-Defined Object](#user-defined-object)
 
 # Object References
 ## Variables Are Labels, Not Boxes
@@ -261,7 +262,7 @@ True
 
 * Fredrik Lundh—creator of key libraries like ElementTree, Tkinter, and the PIL image library—has a short post about the Python garbage collector titled “How Does Python Manage Memory?” He emphasizes that the garbage collector is an implementation feature that behaves differently across Python interpreters. For example, Jython uses the Java garbage collector.
 
-* The CPython 3.4 garbage collector improved handling of objects with a __del__ method, as described in PEP 442 — Safe object finalization.
+* The CPython 3.4 garbage collector improved handling of objects with a `__del__` method, as described in PEP 442 — Safe object finalization.
 
 * Wikipedia has an article about string interning, mentioning the use of this technique in several languages, including Python.
 
@@ -276,7 +277,7 @@ True
 ## Object Representations
 * repr(): Return a string representing the object as the developer wants to see it.
 * str(): Return a string representing the object as the user wants to see it.
-
+* An early realization of the need for distinct string representations for objects appeared in Smalltalk.
 ### classmethod Versus staticmethod
 * The `classmethod` is used to define a method that operates on the class and not on instances. `classmethod` changes the way the method is called, so it receives the class itself as the first argument (usually named `cls`), instead of an instance. Its most common use is for alternative constructors.
   * No matter how you invoke it, class method receives the class as the first argument.
@@ -294,8 +295,21 @@ True
 
 ## Hashable Objects
 * To make an user-defined Object hashable, we must implement `__hash__` (`__eq__` is also required, and we already have it). We also need to make the instances immutable.
+* `__hash__` is usually implemented using the recommended technique of xor-ing the hashes of the instance attributes.
 
 ## Private and “Protected” Attributes in Python
+* Attributes are public in all Python instance and class by default.
+* When (or if) we later need to impose more control with getters and setters, these can be implemented through properties without changing any of the code that already interacts with our objects through the names (e.g., x and y) that were initially simple public attributes.
+* This approach is the opposite of that encouraged by the Java language: a Java programmer cannot start with simple public attributes and only later, if needed, implement properties, because they don’t exist in the language. Therefore, writing getters and setters is the norm in Java—even when those methods do nothing useful—because the API cannot evolve from simple public attributes to getters and setters without breaking all code that uses those attributes.
+* Ward Cunningham, inventor of the wiki and an Extreme Programming pioneer, recommends asking “What’s the simplest thing that could possibly work?” The idea is to focus on the goal.[59] Implementing setters and getters up front is a distraction from the goal. In Python, we can simply use public attributes knowing we can change them to properties later, if the need arises.
+
+* The Java private and protected modifiers normally provide protection against accidents only (i.e., safety). They can only guarantee security against malicious intent if the application is deployed with a security manager, and that seldom happens in practice, even in corporate settings.
+  * That script uses introspection (“reflection” in Java parlance) to get the value of a private field.
+  * Java reflection API can get a reference to the private field
+  * My point is: in Java too, access control modifiers are mostly about safety and not security, at least in practice. 
+  
+
+
 ### Name Mangling
 * In Python, there is no way to create private variables like there is with the private modifier in Java. What we have in Python is a simple mechanism to prevent accidental overwriting of a “private” attribute in a subclass.
   * To prevent this, if you name an instance attribute in the form `__mood` (two leading underscores and zero or at most one trailing underscore), Python stores the name in the instance `__dict__` prefixed with a leading underscore and the class name, so in the `Dog` class, `__mood` becomes `_Dog__mood`, and in `Beagle` class it’s `_Beagle__mood`. This language feature goes by the lovely name of name mangling.
@@ -311,7 +325,47 @@ True
 * In modules, a single _ in front of a top-level name does have an effect: if you write from mymod import * the names with a _ prefix are not imported from mymod. However, you can still write from mymod import `_privatefunc`.
 
 ## Saving Space with the __slots__ Class Attribute
-* By default, Python stores instance attributes in a per-instance dict named __dict__. 
+* By default, Python stores instance attributes in a per-instance dict named `__dict__`. 
+* Dictionaries have a significant memory overhead because of the underlying hash table used to provide fast access. 
+* If you are dealing with millions of instances with few attributes, the `__slots__` class attribute can save a lot of memory, by letting the interpreter store the instance attributes in a `tuple` instead of a `dict`.
+  * If you are handling millions of objects with numeric data, you should really be using NumPy arrays, which are not only memory-efficient but have highly optimized functions for numeric processing, many of which operate on the entire array at once.
+* A `__slots__` attribute inherited from a superclass has no effect. Python only takes into account `__slots__` attributes defined in each class individually.
+* I like to use a tuple for that, because it conveys the message that the `__slots__` definition cannot change.
+* It may be possible, however, to “save memory and eat it too”: if you add the '__dict__' name to the `__slots__` list, your instances will keep attributes named in `__slots__` in the per-instance tuple, but will also support dynamically created attributes, which will be stored in the usual `__dict__`. Of course, having '__dict__' in `__slots__` may entirely defeat its purpose, depending on the number of static and dynamic attributes in each instance and how they are used. Careless optimization is even worse than premature optimization.
+* if the class defines `__slots__`, and you need the instances to be targets of weak references, then you need to include '__weakref__' among the attributes named in `__slots__`.
+
+### THE PROBLEMS WITH `__SLOTS__`
+* To summarize, `__slots__` may provide significant memory savings if properly used, but there are a few caveats:
+  * You must remember to redeclare `__slots__` in each subclass, because the inherited attribute is ignored by the interpreter.
+  * Instances will only be able to have the attributes listed in `__slots__`, unless you include '__dict__' in `__slots__` (but doing so may negate the memory savings).
+  * Instances cannot be targets of weak references unless you remember to include '__weakref__' in `__slots__`.
+  * If your program is not handling millions of instances, it’s probably not worth the trouble of creating a somewhat unusual and tricky class whose instances may not accept dynamic attributes or may not support weak references. Like any optimization, `__slots__` should be used only if justified by a present need and when its benefit is proven by careful profiling.
+
+## Overriding Class Attributes
+* A distinctive feature of Python is how class attributes can be used as default values for instance attributes.
+* But if you write to an instance attribute that does not exist, you create a new instance attribute—e.g., a typecode instance attribute—and the class attribute by the same name is untouched. 
+  * However, from then on, whenever the code handling that instance reads `self.typecode`, the instance `typecode` will be retrieved, effectively **shadowing** the class attribute by the same name. 
+  * This opens the possibility of customizing an individual instance with a different typecode.
+* If you want to change a class attribute you must set it on the class directly, not through an instance. You could change the default typecode for all instances (that don’t have their own typecode) by doing this:
+```
+>>> Vector2d.typecode = 'f'
+```
+* However, there is an idiomatic Python way of achieving a more permanent effect, and being more explicit about the change. Because class attributes are public, they are inherited by subclasses, so it’s common practice to subclass just to customize a class data attribute.
+
+## `__index__`
+* `__index__` is used to coerce an object to an integer index in the specific context of sequence slicing, and was created to solve a need in NumPy.
+* If you are curious about it, A.M. Kuchling’s What’s New in Python 2.5 has a short explanation, and PEP 357 — Allowing Any Object to be Used for Slicing details the need for __index__, from the perspective of an implementor of a C-extension, Travis Oliphant, the lead author of NumPy.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
