@@ -279,6 +279,8 @@ True
 * An early realization of the need for distinct string representations for objects appeared in [Smalltalk](http://esug.org/data/HistoricalDocuments/TheSmalltalkReport/ST07/04wo.pdf).
   * For example, To a programmer, one of an object’s most important properties is its class.
 * repr(): Return a string representing the object as the developer wants to see it.
+  * Because of its role in debugging, calling repr() on an object should never raise an exception. If something goes wrong inside your implementation of `__repr__`, you must deal with the issue and do your best to produce some serviceable output that gives the user a chance of identifying the target object.
+
 * str(): Return a string representing the object as the user wants to see it.
 
 ### classmethod Versus staticmethod
@@ -343,6 +345,7 @@ True
   * Instances will only be able to have the attributes listed in `__slots__`, unless you include '__dict__' in `__slots__` (but doing so may negate the memory savings).
   * Instances cannot be targets of weak references unless you remember to include '__weakref__' in `__slots__`.
   * If your program is not handling millions of instances, it’s probably not worth the trouble of creating a somewhat unusual and tricky class whose instances may not accept dynamic attributes or may not support weak references. Like any optimization, `__slots__` should be used only if justified by a present need and when its benefit is proven by careful profiling.
+* using `__slots__` just to prevent instance attribute creation is not recommended. `__slots__` should be used only to save memory, and only if that is a real issue.
 
 ## Overriding Class Attributes
 * A distinctive feature of Python is how class attributes can be used as default values for instance attributes.
@@ -361,3 +364,68 @@ True
 
 
 # Sequence Hacking, Hashing, and Slicing
+
+## Protocols and Duck Typing
+* You don’t need to inherit from any special class to create a fully functional sequence type in Python; you just need to implement the methods that fulfill the sequence protocol. But what kind of protocol are we talking about?
+* In the context of object-oriented programming, a protocol is an informal interface, defined only in documentation and not in code. 
+  * For example, the sequence protocol in Python entails just the `__len__` and `__getitem__` methods. Any class Spam that implements those methods with the standard signature and semantics can be used anywhere a sequence is expected. Whether Spam is a subclass of this or that is irrelevant; all that matters is that it provides the necessary methods.
+  * We say it is a sequence because it behaves like one, and that is what matters.
+* This became known as **duck typing**, after Alex Martelli’s post quote.
+  * Don’t check whether it is a duck: check whether it quacks-like-a duck, walks-like-a duck, etc, etc, depending on exactly what subset of duck-like behavior you need to play your language-games with. [comp.lang.python, Jul. 26, 2000, Alex Martelli](https://mail.python.org/pipermail/python-list/2000-July/046184.html)
+  * In the Python documentation, you can often tell when a protocol is being discussed when you see language like “a file-like object.” This is a quick way of saying “something that behaves sufficiently like a file, by implementing the parts of the file interface that are relevant in the context.”
+  * When implementing a class that emulates any built-in type, it is important that the emulation only be implemented to the degree that it makes sense for the object being modeled. For example, some sequences may work well with retrieval of individual elements, but extracting a slice may not make sense.
+  * When we don’t need to code nonsense methods just to fulfill some over-designed interface contract and keep the compiler happy, it becomes easier to follow the **KISS principle**.
+
+
+
+* Established protocols naturally evolve in any language that uses dynamic typing, that is, when type-checking done at runtime because there is no static type information in method signatures and variables. Ruby is another important OO language that has dynamic typing and uses protocols.
+
+### HOW SLICING WORKS
+* Built-in `slice` method `indices` exposes the tricky logic that’s implemented in the built-in sequences to gracefully handle missing or negative indices and slices that are longer than the target sequence. This method produces “normalized” tuples of nonnegative start, stop, and stride integers adjusted to fit within the bounds of a sequence of the given length.
+* Example considering a sequence of len == 5, e.g., 'ABCDE':
+```
+>>> slice(None, 10, 2).indices(5)  # 'ABCDE'[:10:2] is the same as 'ABCDE'[0:5:2]
+(0, 5, 2)
+>>> slice(-3, None, None).indices(5)  # 'ABCDE'[-3:] is the same as 'ABCDE'[2:5:1]
+(2, 5, 1)
+```
+#### A SLICE-AWARE __GETITEM__
+* This is not slice-aware
+```
+    def __getitem__(self, index):
+        return self._components[index]
+```
+
+* This is slice-aware
+```
+    def __getitem__(self, index):
+        cls = type(self)
+        if isinstance(index, slice):
+            return cls(self._components[index]) #invoke the class to build another Vector instance from a slice of the _components array
+        elif isinstance(index, numbers.Integral):
+            return self._components[index]   5
+        else:
+            msg = '{cls.__name__} indices must be integers'
+            raise TypeError(msg.format(cls=cls))   6
+```
+## Dynamic Attribute Access
+* The `__getattr__` method is invoked by the interpreter when attribute lookup fails. In simple terms, given the expression `my_obj.x`, Python checks if the `my_obj` instance has an attribute named `x`; if not, the search goes to the class (`my_obj.__class__`), and then up the inheritance graph. If the `x` attribute is not found, then the `__getattr__` method defined in the class of `my_obj` is called with self and the name of the attribute as a string (e.g., 'x').
+* However, Python only calls that method as a fall back, when the object does not have the named attribute. However, after we assign `my_obj.x = 10`, the `my_obj` object now has an `x` attribute, so `__getattr__` will no longer be called to retrieve `my_obj.x`: the interpreter will just return the value 10 that is bound to `my_obj.x`.
+* very often when you implement `__getattr__` you need to code `__setattr__` as well, to avoid inconsistent behavior in your objects.
+
+## Hashing and a Faster ==
+* Reduce
+  * The first argument to reduce() is a two-argument function, and the second argument is an iterable. Let’s say we have a two-argument function fn and a list lst. When you call reduce(fn, lst), fn will be applied to the first pair of elements—fn(lst[0], lst[1])—producing a first result, r1. Then fn is applied to r1 and the next element—fn(r1, lst[2])—producing a second result, r2. Now fn(r2, lst[3]) is called to produce r3 … and so on until the last element, when a single result, rN, is returned.
+  * When using reduce, it’s good practice to provide the third argument, reduce(function, iterable, initializer), to prevent this exception: TypeError: reduce() of empty sequence with no initial value (excellent message: explains the problem and how to fix it). The initializer is the value returned if the sequence is empty and is used as the first argument in the reducing loop, so it should be the identity value of the operation. As examples, for +, |, ^ the initializer should be 0, but for *, & it should be 1.
+  * The powerful reduce higher-order function is also known as fold, accumulate, aggregate, compress, and inject. For more information, see Wikipedia’s [“Fold (higher-order function)”](https://en.wikipedia.org/wiki/Fold_(higher-order_function)) article, which presents applications of that higher-order function with emphasis on functional programming with recursive data structures. The article also includes a table listing fold-like functions in dozens of programming languages.
+  * In the same conversation, Alex Martelli suggests the reduce built-in in Python 2 was more trouble than it was worth, because it encouraged coding idioms that were hard to explain. He was most convincing: the function was demoted to the functools module in Python 3.
+
+* The `__hash__` method is a perfect example of a map-reduce computation.
+* In Python 3, `map` is lazy: it creates a generator that yields the results on demand, thus saving memory—just like the generator expression. `map` would be less efficient in Python 2, where the map function builds a new list with the results.
+
+## Formating
+
+
+
+
+
