@@ -9,6 +9,7 @@
 * [Garbage Collection](#garbage-collection)
 * [User-Defined Object](#user-defined-object)
 * [Sequence Hacking, Hashing, and Slicing](#sequence-hacking-hashing-and-slicing)
+* [Interfaces: From Protocols to ABCs](#interfaces-from-protocols-to-abcs)
 
 # Object References
 ## Variables Are Labels, Not Boxes
@@ -370,15 +371,19 @@ True
 * In the context of object-oriented programming, a protocol is an informal interface, defined only in documentation and not in code. 
   * For example, the sequence protocol in Python entails just the `__len__` and `__getitem__` methods. Any class Spam that implements those methods with the standard signature and semantics can be used anywhere a sequence is expected. Whether Spam is a subclass of this or that is irrelevant; all that matters is that it provides the necessary methods.
   * We say it is a sequence because it behaves like one, and that is what matters.
+  * protocols are defined as the informal interfaces that make polymorphism work in languages with dynamic typing like Python.
 * This became known as **duck typing**, after Alex Martelli’s post quote.
   * Don’t check whether it is a duck: check whether it quacks-like-a duck, walks-like-a duck, etc, etc, depending on exactly what subset of duck-like behavior you need to play your language-games with. [comp.lang.python, Jul. 26, 2000, Alex Martelli](https://mail.python.org/pipermail/python-list/2000-July/046184.html)
+  * The dynamic protocols are the hallmark of duck typing
   * In the Python documentation, you can often tell when a protocol is being discussed when you see language like “a file-like object.” This is a quick way of saying “something that behaves sufficiently like a file, by implementing the parts of the file interface that are relevant in the context.”
   * When implementing a class that emulates any built-in type, it is important that the emulation only be implemented to the degree that it makes sense for the object being modeled. For example, some sequences may work well with retrieval of individual elements, but extracting a slice may not make sense.
   * When we don’t need to code nonsense methods just to fulfill some over-designed interface contract and keep the compiler happy, it becomes easier to follow the **KISS principle**.
-
-
+  * Duck typing is operating with objects regardless of their types, as long as they implement certain protocols.
+  * Duck typing: ignoring an object’s actual type, focusing instead on ensuring that the object implements the method names, signatures, and semantics required for its intended use
+  * In Python, this mostly boils down to avoiding the use of isinstance to check the object’s type (not to mention the even worse approach of checking, for example, whether type(foo) is bar—which is rightly anathema as it inhibits even the simplest forms of inheritance!).
 
 * Established protocols naturally evolve in any language that uses dynamic typing, that is, when type-checking done at runtime because there is no static type information in method signatures and variables. Ruby is another important OO language that has dynamic typing and uses protocols.
+
 
 ### HOW SLICING WORKS
 * Built-in `slice` method `indices` exposes the tricky logic that’s implemented in the built-in sequences to gracefully handle missing or negative indices and slices that are longer than the target sequence. This method produces “normalized” tuples of nonnegative start, stop, and stride integers adjusted to fit within the bounds of a sequence of the given length.
@@ -423,7 +428,77 @@ True
 * The `__hash__` method is a perfect example of a map-reduce computation.
 * In Python 3, `map` is lazy: it creates a generator that yields the results on demand, thus saving memory—just like the generator expression. `map` would be less efficient in Python 2, where the map function builds a new list with the results.
 
-## Formating
+# Interfaces: From Protocols to ABCs
+## Interfaces and Protocols in Python Culture
+* How do interfaces work in a dynamic-typed language? 
+  * First, the basics: even without an *interface* keyword in the language, and regardless of ABCs, every class has an interface: the set public attributes (methods or data attributes) implemented or inherited by the class. This includes special methods, like `__getitem__` or `__add__`.
+  * By definition, protected and private attributes are not part of an interface, even if “protected” is merely a naming convention (the single leading underscore) and private attributes are easily accessed. It is bad form to violate these conventions.
+  * On the other hand, it’s not a sin to have public data attributes as part of the interface of an object, because—if necessary—a data attribute can always be turned into a property implementing getter/setter logic without breaking client code that uses the plain `obj.attr` syntax.
+  
+* A useful complementary definition of interface is: the subset of an object’s public methods that enable it to play a specific role in the system. 
+  * That’s what is implied when the Python documentation mentions “a file-like object” or “an iterable,” without specifying a class. 
+  * An interface seen as a set of methods to fulfill a role is what Smalltalkers called a procotol, and the term spread to other dynamic language communities. 
+  * Protocols are independent of inheritance. A class may implement several protocols, enabling its instances to fulfill several roles.
+  * Protocols are interfaces, but because they are informal—defined only by documentation and conventions—protocols cannot be enforced like formal interfaces can (However ABCs enforce interface conformance). A protocol may be partially implemented in a particular class, and that’s OK.
+  * “X-like object,” “X protocol,” and “X interface” are synonyms in the minds of Pythonistas.
+  * One of the most fundamental interfaces in Python is the sequence protocol.
+### Python Digs Sequences
+* The philosophy of the Python data model is to cooperate with essential protocols as much as possible. When it comes to sequences, Python tries hard to work with even the simplest implementations.
+* In summary, given the importance of the sequence protocol, in the absence __iter__ and __contains__ Python still manages to make iteration and the in operator work by invoking __getitem__.
+* Iteration in Python represents an extreme form of duck typing: the interpreter tries two different methods to iterate over objects.
+  * When there is no method `__iter__`, as a fallback, when Python sees a `__getitem__` method, it tries to iterate over the object by calling that method with integer indexes starting with 0. 
+  * Python is smart enough to make the `in` operator work even if there's no `__contains__` method: it does a full scan to check if an item is present.
+
+### Monkey-Patching to Implement a Protocol at Runtime
+* When you follow established protocols, you improve your chances of leveraging existing standard library and third-party code, thanks to duck typing.
+* Monkey patching: changing a class or module at runtime, without touching the source code. Monkey patching is powerful, but the code that does the actual patching is very tightly coupled with the program to be patched, often handling private and undocumented parts.
+```
+>>> def set_card(deck, position, card):
+...     deck._cards[position] = card
+...
+>>> FrenchDeck.__setitem__ = set_card
+>>> shuffle(deck)
+>>> deck[:5]
+[Card(rank='3', suit='hearts'), Card(rank='4', suit='diamonds'), Card(rank='4',
+suit='clubs'), Card(rank='7', suit='hearts'), Card(rank='9', suit='spades')]
+```
+* protocols are dynamic: random.shuffle doesn’t care what type of argument it gets, it only needs the object to implement part of the mutable sequence protocol (i.e. `__setitem__` method). It doesn’t even matter if the object was “born” with the necessary methods or if they were somehow acquired later.
+
+## ABC
+* ABCs, like descriptors and metaclasses, are tools for building frameworks. Therefore, only a very small minority of Python developers can create ABCs without imposing unreasonable limitations and needless work on fellow programmers.
+
+### Alex Martelli’s Waterfowl
+* I’m recommending supplementing (not entirely replacing—in certain contexts it shall still serve) good old duck typing with… goose typing!
+* What goose typing means is: isinstance(obj, cls) is now just fine… as long as cls is an abstract base class—in other words, cls’s metaclass is abc.ABCMeta.
+  * You can find many useful existing abstract classes in collections.abc (and additional ones in the numbers module of The Python Standard Library).
+
+* Python’s ABCs add one major practical advantage: the `register` class method, which lets end-user code “declare” that a certain class becomes a “virtual” subclass of an ABC (for this purpose the registered class must meet the ABC’s method name and signature requirements, and more importantly the underlying semantic contract—but it need not have been developed with any awareness of the ABC, and in particular need not inherit from it!). 
+  * This goes a long way toward breaking the rigidity and strong coupling that make inheritance something to use with much more caution than typically practiced by most OOP programmers…
+  * Sometimes you don’t even need to register a class for an ABC to recognize it as a subclass!
+* That’s the case for the ABCs whose essence boils down to a few special methods.
+  * whenever you’re implementing a class embodying any of the concepts represented in the ABCs in numbers, collections.abc, or other framework you may be using, be sure (if needed) to subclass it from, or register it into, the corresponding ABC. At the start of your programs using some library or framework defining classes which have omitted to do that, perform the registrations yourself; then, when you must check for (most typically) an argument being, e.g, “a sequence,” check whether:
+  ```
+  isinstance(the_arg, collections.abc.Sequence)
+  ```
+ * And, don’t define custom ABCs (or metaclasses) in production code… if you feel the urge to do so, I’d bet it’s likely to be a case of “all problems look like a nail”-syndrome for somebody who just got a shiny new hammer—you (and future maintainers of your code) will be much happier sticking with straightforward and simple code, eschewing such depths. Valē!
+* Alex makes the point that inheriting from an ABC is more than implementing the required methods: it’s also a clear declaration of intent by the developer. That intent can also be made explicit through registering a virtual subclass.
+
+* In addition, the use of `isinstance` and `issubclass` becomes more acceptable to test against ABCs. In the past, these functions worked against duck typing, but with ABCs they become more flexible. After all, if a component does not implement an ABC by subclassing, it can always be registered after the fact so it passes those explicit type checks.
+
+* However, even with ABCs, you should beware that excessive use of isinstance checks may be a **code smell**—a symptom of bad OO design. It’s usually not OK to have a chain of if/elif/elif with insinstance checks performing different actions depending on the type of an object: you should be using polymorphism for that—i.e., designing your classes so that the interpreter dispatches calls to the proper methods, instead of you hardcoding the dispatch logic in if/elif/elif blocks.
+* There is a common, practical exception to the preceding recommendation: some Python APIs accept a single str or a sequence of str items; if it’s just a single str, you want to wrap it in a list, to ease processing. Because str is a sequence type, the simplest way to distinguish it from any other immutable sequence is to do an explicit isinstance(x, str) check.
+
+* On the other hand, it’s usually OK to perform an insinstance check against an ABC if you must enforce an API contract: “Dude, you have to implement this if you want to call me,” as technical reviewer Lennart Regebro put it. That’s particularly useful in systems that have a plug-in architecture. Outside of frameworks, duck typing is often simpler and more flexible than type checks.
+
+* For example, in several classes in this book, when I needed to take a sequence of items and process them as a list, instead of requiring a list argument by type checking, I simply took the argument and immediately built a list from it: that way I can accept any iterable, and if the argument is not iterable, the call will fail soon enough with a very clear message. One example of this code pattern is in the __init__ method in Example 11-13, later in this chapter. Of course, this approach wouldn’t work if the sequence argument shouldn’t be copied, either because it’s too large or because my code needs to change it in place. Then an insinstance(x, abc.MutableSequence) would be better. If any iterable is acceptable, then calling iter(x) to obtain an iterator would be the way to go
+
+* Finally, in his essay, Alex reinforces more than once the need for restraint in the creation of ABCs. An ABC epidemic would be disastrous, imposing excessive ceremony in a language that became popular because it’s practical and pragmatic.
+
+* ABCs are meant to encapsulate very general concepts, abstractions, introduced by a framework—things like “a sequence” and “an exact number.” [Readers] most likely don’t need to write any new ABCs, just use existing ones correctly, to get 99.9% of the benefits without serious risk of misdesign.
+
+* EAFP = it’s easier to ask forgiveness than permission
+
+### Subclassing an ABC
 
 
 
