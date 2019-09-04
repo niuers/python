@@ -452,6 +452,7 @@ True
 ### Monkey-Patching to Implement a Protocol at Runtime
 * When you follow established protocols, you improve your chances of leveraging existing standard library and third-party code, thanks to duck typing.
 * Monkey patching: changing a class or module at runtime, without touching the source code. Monkey patching is powerful, but the code that does the actual patching is very tightly coupled with the program to be patched, often handling private and undocumented parts.
+
 ```
 >>> def set_card(deck, position, card):
 ...     deck._cards[position] = card
@@ -463,6 +464,14 @@ True
 suit='clubs'), Card(rank='7', suit='hearts'), Card(rank='9', suit='spades')]
 ```
 * protocols are dynamic: random.shuffle doesn’t care what type of argument it gets, it only needs the object to implement part of the mutable sequence protocol (i.e. `__setitem__` method). It doesn’t even matter if the object was “born” with the necessary methods or if they were somehow acquired later.
+
+* Monkey patching has a bad reputation. If abused, it can lead to systems that are hard to understand and maintain. The patch is usually tightly coupled with its target, making it brittle. Another problem is that two libraries that apply monkey-patches may step on each other’s toes, with the second library to run destroying patches of the first.
+
+* But monkey patching can also be useful, for example, to make a class implement a protocol at runtime. The adapter design pattern solves the same problem by implementing a whole new class.
+
+* It’s easy to monkey-patch Python code, but there are limitations. Unlike Ruby and JavaScript, Python does not let you monkey-patch the built-in types. I actually consider this an advantage, because you can be certain that a `str` object will always have those same methods. This limitation reduces the chance that external libraries try to apply conflicting patches.
+
+
 
 ## ABC
 * ABCs, like descriptors and metaclasses, are tools for building frameworks. Therefore, only a very small minority of Python developers can create ABCs without imposing unreasonable limitations and needless work on fellow programmers.
@@ -499,6 +508,25 @@ suit='clubs'), Card(rank='7', suit='hearts'), Card(rank='9', suit='spades')]
 * EAFP = it’s easier to ask forgiveness than permission
 
 ### Subclassing an ABC
+* Since C++ 2.0 (1989), abstract classes have been used to specify interfaces in that language. The designers of Java opted not to have multiple inheritance of classes, which precluded the use of abstract classes as interface specifications—because often a class needs to implement more than one interface. 
+  * But they added the interface as a language construct, and a class can implement more than one interface—a form of multiple inheritance. Making interface definitions more explicit than ever was a great contribution of Java. With Java 8, an interface can provide method implementations, called Default Methods. With this, Java interfaces became closer to abstract classes in C++ and Python.
+* The Go language has a completely different approach. 
+  * First of all, there is no inheritance in Go. You can define interfaces, but you don’t need (and you actually can’t) explicitly say that a certain type implements an interface. The compiler determines that automatically. So what they have in Go could be called “static duck typing,” in the sense that interfaces are checked at compile time but what matters is what types actually implement.
+  * Compared to Python, it’s as if, in Go, every ABC implemented the `__subclasshook__` checking function names and signatures, and you never subclassed or registered an ABC. If we wanted Python to look more like Go, we would have to perform type checks on all function arguments. Some of the infrastructure is available (recall Function Annotations). Guido has already said he thinks it’s OK to use those annotations for type checking—at least in support tools. See Soapbox in Chapter 5 for more about this.
+* Rubyists are firm believers in duck typing, and Ruby has no formal way to declare an interface or an abstract class, except to do the same we did in Python prior to 2.6: raise NotImplementedError in the body of methods to make them abstract by forcing the user to subclass and implement them.
+  * Meanwhile, I read that Yukihiro “Matz” Matsumoto, creator of Ruby, said in a keynote in September 2014 that static typing may be in the future of the language. That was at Ruby Kaigi in Japan, one of the most important Ruby conferences every year. As I write this, I haven’t seen a transcript, but Godfrey Chan posted about it on his blog: “Ruby Kaigi 2014: Day 2”. From Chan’s report, it seems Matz focused on function annotations. There is even mention of Python function annotations.
+* I wonder if function annotations would be really good without ABCs to add structure to the type system without losing flexibility. So maybe formal interfaces are also in the future of Ruby.
+* I believe Python ABCs, with the register function and `__subclasshook__`, brought formal interfaces to the language without throwing away the advantages of dynamic typing.
+
+Perhaps the geese are poised to overtake the ducks.
+
+### Metaphors and Idioms in Interfaces
+* "About Face" is by far the best book about UI design I’ve read—and I’ve read a few. Letting go of metaphors as a design paradigm, and replacing it with “idiomatic interfaces” was the most valuable thing I learned from Cooper’s work. 
+* As mentioned, Cooper does not deal with APIs, but the more I think about his ideas, the more I see how they apply to Python. 
+  * The fundamental protocols of the language are what Cooper calls “idioms.” 
+  * Once we learn what a “sequence” is we can apply that knowledge in different contexts. This is a main theme of Fluent Python: highlighting the fundamental idioms of the language, so your code is concise, effective, and readable—for a fluent Pythonista.
+  
+
 ### ABCs in the Standard Library
 #### The `numbers` Package
 * The numbers package defines the so-called “numerical tower” (i.e., this linear hierarchy of ABCs), where Number is the topmost superclass, Complex is its immediate subclass, and so on, down to Integral:
