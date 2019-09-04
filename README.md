@@ -332,3 +332,31 @@ As far as I know, Learning Python Design Patterns, by Gennadiy Zlobin (Packt), i
 
 # CPython
 * The CPython VM that runs the bytecode is a stack machine, so the operations LOAD and POP refer to the stack.
+
+# Is Python Weakly Typed?
+* Discussions about language typing disciplines are sometimes confused due to lack of a uniform terminology. A better way of talking about typing discipline is to consider two different axes:
+* To summarize, Python uses dynamic and strong typing. PEP 484 - Type Hints will not change that, but will allow API authors to add optional type annotations so that tools can perform some static type checking.
+
+## Strong versus weak typing
+* If the language rarely performs implicit conversion of types, it’s considered strongly typed; if it often does it, it’s weakly typed. Java, C++, and Python are strongly typed. PHP, JavaScript, and Perl are weakly typed.
+* Here are some examples of why weak typing is bad:
+```
+// this is JavaScript (tested with Node.js v0.10.33)
+'' == '0'   // false
+0 == ''     // true
+0 == '0'    // true
+'' < 0      // false
+'' < '0'    // true
+```
+* Python does not perform automatic coercion between strings and numbers, so the `==` expressions all result False—preserving the transitivity of `==`—and the `<` comparisons raise TypeError in Python 3.
+
+## Static versus dynamic typing
+* If type-checking is performed at compile time, the language is statically typed; if it happens at runtime, it’s dynamically typed. 
+* Static typing requires type declarations (some modern languages use type inference to avoid some of that). 
+  * Fortran and Lisp are the two oldest programming languages still alive and they use, respectively, static and dynamic typing.
+
+* Strong typing helps catch bugs early.
+* Static typing makes it easier for tools (compilers, IDEs) to analyze code to detect errors and provide other services (optimization, refactoring, etc.). 
+* Dynamic typing increases opportunities for reuse, reducing line count, and allows interfaces to emerge naturally as protocols, instead of being imposed early on.
+
+
