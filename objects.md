@@ -536,10 +536,31 @@ suit='clubs'), Card(rank='7', suit='hearts'), Card(rank='9', suit='spades')]
 
 * Inheritance is guided by a special class attribute named `__mro__`—the Method Resolution Order. It basically lists the class and its superclasses in the order Python uses to search for methods. If you inspect the `__mro__`, you’ll see that it lists only the “real” superclasses.
 * Even if `register` can now be used as a decorator, it’s more widely deployed as a function to register classes defined elsewhere. 
+* We should refrain from creating our own ABCs, except when we are building user-extensible frameworks—which most of the time we are not.
+
+* Although ABCs facilitate type checking, it’s not something that you should overuse in a program. At its heart, Python is a dynamic language that gives you great flexibility. Trying to enforce type constraints everywhere tends to result in code that is more complicated than it needs to be. You should embrace Python’s flexibility.
+* If you feel tempted to create a custom ABC, please first try to solve your problem through regular duck-typing.
+
 
 ### Geese Can Behave as Ducks
+* A class can be recognized as a virtual subclass of an ABC even without registration.
+```
+>>> class Struggle:
+...     def __len__(self): return 23
+...
+>>> from collections import abc
+>>> isinstance(Struggle(), abc.Sized)
+True
+>>> issubclass(Struggle, abc.Sized)
+True
+```
 
 
+
+### Others
+* Probably the biggest news in the Python world in 2014 was that Guido van Rossum gave a green light to the implementation of optional static type checking using function annotations.
+* The idea is to let programmers optionally use annotations to declare parameter and return types in function definitions. The key word here is optionally. You’d only add such annotations if you want the benefits and constraints that come with them, and you could put them in some functions but not in others.
+* I am going to make one additional assumption: the main use cases will be linting, IDEs, and doc generation. These all have one thing in common: it should be possible to run a program even though it fails to type check. Also, adding types to a program should not hinder its performance (nor will it help :-).
 
 
 
