@@ -499,6 +499,47 @@ suit='clubs'), Card(rank='7', suit='hearts'), Card(rank='9', suit='spades')]
 * EAFP = it’s easier to ask forgiveness than permission
 
 ### Subclassing an ABC
+### ABCs in the Standard Library
+#### The `numbers` Package
+* The numbers package defines the so-called “numerical tower” (i.e., this linear hierarchy of ABCs), where Number is the topmost superclass, Complex is its immediate subclass, and so on, down to Integral:
+  * Number
+  * Complex
+  * Real
+  * Rational
+  * Integral
+
+### Defining and Using an ABC
+* The best way to declare an ABC is to subclass abc.ABC or any other ABC.
+* Concrete methods in an ABC must rely only on the interface defined by the ABC (i.e., other concrete or abstract methods or properties of the ABC).
+* An abstract method can actually have an implementation. Even if it does, subclasses will still be forced to override it, but they will be able to invoke the abstract method with super(), adding functionality to it instead of implementing from scratch.
+* An ABC is a special kind of class; for example, “regular” classes don’t check subclasses, so this is a special behavior of ABCs.(???)
+* The order of stacked function decorators usually matters, and in the case of @abstractmethod, the documentation is explicit: 
+  * When abstractmethod() is applied in combination with other method descriptors, it should be applied as the innermost decorator
+  * In other words, no other decorator may appear between @abstractmethod and the def statement.
+
+* An idiom worth mentioning: 
+  * In `__init__`, `self._balls` stores `list(iterable)` and not just a reference to iterable (i.e., we did not merely assign iterable to `self._balls`). 
+    * This makes our `LotteryBlower` flexible because the `iterable` argument may be any iterable type. 
+    * At the same time, we make sure to store its items in a list so we can pop items. And even if we always get lists as the iterable argument, list(iterable) produces a copy of the argument, which is a good practice considering we will be removing items from it and the client may not be expecting the list of items she provided to be changed.
+  ```
+  import random
+  from tombola import Tombola
+  class LotteryBlower(Tombola):
+    def __init__(self, iterable):
+        self._balls = list(iterable)
+  ```
+
+* Declaring virtual subclasses with the register method
+  * An essential characteristic of goose typing—and the reason why it deserves a waterfowl name—is the ability to register a class as a virtual subclass of an ABC, even if it does not inherit from it. When doing so, we promise that the class faithfully implements the interface defined in the ABC—and Python will believe us without checking. If we lie, we’ll be caught by the usual runtime exceptions.
+  * This is done by calling a register method on the ABC. The registered class then becomes a virtual subclass of the ABC, and will be recognized as such by functions like issubclass and isinstance, but it will not inherit any methods or attributes from the ABC.
+  * Virtual subclasses do not inherit from their registered ABCs, and are not checked for conformance to the ABC interface at any time, not even when they are instantiated (Compare with subclasses of ABCs that do get checked). It’s up to the subclass to actually implement all the methods needed to avoid runtime errors.
+
+* Inheritance is guided by a special class attribute named `__mro__`—the Method Resolution Order. It basically lists the class and its superclasses in the order Python uses to search for methods. If you inspect the `__mro__`, you’ll see that it lists only the “real” superclasses.
+* Even if `register` can now be used as a decorator, it’s more widely deployed as a function to register classes defined elsewhere. 
+
+### Geese Can Behave as Ducks
+
+
 
 
 
