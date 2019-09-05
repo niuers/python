@@ -11,6 +11,7 @@
 * [Sequence Hacking, Hashing, and Slicing](#sequence-hacking-hashing-and-slicing)
 * [Interfaces: From Protocols to ABCs](#interfaces-from-protocols-to-abcs)
 * [Inheritance](#inheritance)
+* [Operator Overloading](#operator-overloading)
 
 # Object References
 ## Variables Are Labels, Not Boxes
@@ -593,7 +594,12 @@ True
 
 
 # Inheritance
-* Java doesn't have multiple inheritance, but Java supports multiple inheritance of interfaces.
+* Java doesn't have multiple inheritance, but Java supports multiple inheritance of interfaces. Except that Java interfaces cannot have state—a key distinction.
+* Scala implements traits. Other languages supporting traits are the latest stable versions of PHP and Groovy, and the under-construction languages Rust and Perl 6—so it’s fair to say that traits are trendy as I write this.
+* Ruby offers an original take on multiple inheritance: it does not support it, but introduces mixins as a language feature. A Ruby class can include a module in its body, so the methods defined in the module become part of the class implementation. This is a “pure” form of mixin, with no inheritance involved, and it’s clear that a Ruby mixin has no influence on the type of the class where it’s used. This provides the benefits of mixins, while avoiding many of its usual problems.
+* Go has no inheritance at all, but it implements interfaces in a way that resembles a static form of duck typing (see Soapbox for more about this). Julia avoids the terms “classes” and has only “types.” 
+* Julia has a type hierarchy but subtypes cannot inherit structure, only behaviors, and only abstract types can be subtyped. In addition, Julia methods are implemented using multiple dispatch
+
 
 ## Subclassing Built-In Types Is Tricky
 * The code of the built-ins (written in C) does not call special methods overridden by user-defined classes.
@@ -651,12 +657,24 @@ Note that when calling an instance method directly on a class, you must pass sel
 * PROVIDE AGGREGATE CLASSES TO USERS
   * If some combination of ABCs or mixins is particularly useful to client code, provide a class that brings them together in a sensible way. Grady Booch calls this an aggregate class.
   * “A class that is constructed primarily by inheriting from mixins and does not add its own structure or behavior is called an aggregate class.”, Grady Booch et al., Object Oriented Analysis and Design, 3E (Addison-Wesley, 2007), p. 109.
+  * Aggregate classes normally don't have its methods.
 
 * “FAVOR OBJECT COMPOSITION OVER CLASS INHERITANCE.”
   * Even with single inheritance, this principle enhances flexibility, because subclassing is a form of tight coupling, and tall inheritance trees tend to be brittle.
   * Composition and delegation can replace the use of mixins to make behaviors available to different classes, but cannot replace the use of interface inheritance to define a hierarchy of types.
 
+* If, while working as an application developer, you find yourself building multilevel class hierarchies, it’s likely that one or more of the following applies:
+  * You are reinventing the wheel. Go look for a framework or library that provides components you can reuse in your application.
+  * You are using a badly designed framework. Go look for an alternative.
+  * You are overengineering. Remember the KISS principle.
+  * You became bored coding applications and decided to start a new framework. Congratulations and good luck!
+  * It’s also possible that all of the above apply to your situation: you became bored and decided to reinvent the wheel by building your own overengineered and badly designed framework, which is forcing you to code class after class to solve trivial problems. Hopefully you are having fun, or at least getting paid for it.
 
+* 
+### References
+* Simionato has a long series of illuminating blog posts about multiple inheritance in Python, including The wonders of cooperative inheritance, or using super in Python 3; Mixins considered harmful, part 1 and part 2; and Things to Know About Python Super, part 1, part 2 and part 3. The oldest posts use the Python 2 super syntax, but are still relevant.
+
+# Operator Overloading
 
   
 
