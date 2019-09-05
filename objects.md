@@ -10,6 +10,7 @@
 * [User-Defined Object](#user-defined-object)
 * [Sequence Hacking, Hashing, and Slicing](#sequence-hacking-hashing-and-slicing)
 * [Interfaces: From Protocols to ABCs](#interfaces-from-protocols-to-abcs)
+* [Inheritance](#inheritance)
 
 # Object References
 ## Variables Are Labels, Not Boxes
@@ -589,6 +590,79 @@ True
 * Probably the biggest news in the Python world in 2014 was that Guido van Rossum gave a green light to the implementation of optional static type checking using function annotations.
 * The idea is to let programmers optionally use annotations to declare parameter and return types in function definitions. The key word here is optionally. You’d only add such annotations if you want the benefits and constraints that come with them, and you could put them in some functions but not in others.
 * I am going to make one additional assumption: the main use cases will be linting, IDEs, and doc generation. These all have one thing in common: it should be possible to run a program even though it fails to type check. Also, adding types to a program should not hinder its performance (nor will it help :-).
+
+
+# Inheritance
+* Java doesn't have multiple inheritance, but Java supports multiple inheritance of interfaces.
+
+## Subclassing Built-In Types Is Tricky
+* The code of the built-ins (written in C) does not call special methods overridden by user-defined classes.
+  * Officially, CPython has no rule at all for when exactly overridden method of subclasses of built-in types get implicitly called or not. As an approximation, these methods are never called by other built-in methods of the same object. For example, an overridden `__getitem__()` in a subclass of dict will not be called by e.g. the built-in `get()` method.
+  * The problem is not limited to calls within an instance—whether `self.get()` calls `self.__getitem__()`)—but also happens with overridden methods of other classes that should be called by the built-in methods.
+* Subclassing built-in types like dict or list or str directly is error-prone because the built-in methods mostly ignore user-defined overrides. Instead of subclassing the built-ins, derive your classes from the collections module using UserDict, UserList, and UserString, which are designed to be easily extended.
+* To summarize: the problem described in this section applies only to method delegation within the C language implementation of the built-in types, and only affects user-defined classes derived directly from those types. If you subclass from a class coded in Python, such as UserDict or MutableMapping, you will not be troubled by this.
+
+## Multiple Inheritance and Method Resolution Order
+* Any language implementing multiple inheritance needs to deal with potential naming conflicts when unrelated ancestor classes implement a method by the same name. This is called the “diamond problem,” 
+* In C++, the programmer must qualify method calls with class names to resolve this ambiguity. This can be done in Python as well.
+  * You can always call a method on a superclass directly, passing the instance as an explicit argument.
+* The ambiguity of a call like d.pong() is resolved because Python follows a specific order when traversing the inheritance graph. That order is called MRO: Method Resolution Order. Classes have an attribute called __mro__ holding a tuple of references to the superclasses in MRO order, from the current class all the way to the object class.
+* However, it’s also possible, and sometimes convenient, to bypass the MRO and invoke a method on a superclass directly. For example, the D.ping method could be written as:
+```
+    def ping(self):
+        A.ping(self)  # instead of super().ping()
+        print('post-ping:', self)
+```        
+Note that when calling an instance method directly on a class, you must pass self explicitly, because you are accessing an unbound method.
+  * However, it’s safest and more future-proof to use super(), especially when calling methods on a framework, or any class hierarchies you do not control.
+  * The MRO takes into account not only the inheritance graph but also the order in which superclasses are listed in a subclass declaration. In other words, if in diamond.py (Example 12-4) the D class was declared as class D(C, B):, the __mro__ of class D would be different: C would be searched before B.
+
+### Multiple Inheritance in the Real World
+* inheritance is used for different reasons, and multiple inheritance adds alternatives and complexity. It’s easy to create incomprehensible and brittle designs using multiple inheritance.
+* DISTINGUISH INTERFACE INHERITANCE FROM IMPLEMENTATION INHERITANCE
+  * When dealing with multiple inheritance, it’s useful to keep straight the reasons why subclassing is done in the first place. The main reasons are:
+    * Inheritance of interface creates a subtype, implying an “is-a” relationship.
+    * Inheritance of implementation avoids code duplication by reuse.
+  * In practice, both uses are often simultaneous, but whenever you can make the intent clear, do it. Inheritance for code reuse is an implementation detail, and it can often be replaced by composition and delegation. On the other hand, interface inheritance is the backbone of a framework.
+
+* MAKE INTERFACES EXPLICIT WITH ABCS
+  * In modern Python, if a class is designed to define an interface, it should be an explicit ABC. In Python ≥ 3.4, this means: subclass abc.ABC or another ABC.
+
+* USE MIXINS FOR CODE REUSE
+  * If a class is designed to provide method implementations for reuse by multiple unrelated subclasses, without implying an “is-a” relationship, it should be an explicit mixin class. Conceptually, a mixin does not define a new type; it merely bundles methods for reuse. A mixin should never be instantiated, and concrete classes should not inherit only from a mixin. Each mixin should provide a single specific behavior, implementing few and very closely related methods.
+  * Mixins are a sort of class that is used to "mix in" extra properties and methods into a class. This allows you to create classes in a compositional style.
+  * However, in Python the class hierarchy is defined right to left, so in this case the Mixin2 class is the base class, extended by Mixin1 and finally by BaseClass. This is usually fine because many times the mixin classes don't override each other's, or the base class' methods. But if you do override methods or properties in your mixins this can lead to unexpected results because the priority of how methods are resolved is from left to right.
+
+  ```
+  class MyClass(BaseClass, Mixin1, Mixin2):
+    pass
+  ```
+
+* MAKE MIXINS EXPLICIT BY NAMING
+* AN ABC MAY ALSO BE A MIXIN; THE REVERSE IS NOT TRUE
+  * Because an ABC can implement concrete methods, it works as a mixin as well. An ABC also defines a type, which a mixin does not. And an ABC can be the sole base class of any other class, while a mixin should never be subclassed alone except by another, more specialized mixin—not a common arrangement in real code.
+
+  * One restriction applies to ABCs and not to mixins: the concrete methods implemented in an ABC should only collaborate with methods of the same ABC and its superclasses. This implies that concrete methods in an ABC are always for convenience, because everything they do, a user of the class can also do by calling other methods of the ABC.
+
+* DON’T SUBCLASS FROM MORE THAN ONE CONCRETE CLASS
+ * Concrete classes should have zero or at most one concrete superclass.[93] In other words, all but one of the superclasses of a concrete class should be ABCs or mixins.
+ * Scott Meyer’s More Effective C++, which goes even further: “all non-leaf classes should be abstract” (i.e., concrete classes should not have concrete superclasses at all).
+
+* PROVIDE AGGREGATE CLASSES TO USERS
+  * If some combination of ABCs or mixins is particularly useful to client code, provide a class that brings them together in a sensible way. Grady Booch calls this an aggregate class.
+  * “A class that is constructed primarily by inheriting from mixins and does not add its own structure or behavior is called an aggregate class.”, Grady Booch et al., Object Oriented Analysis and Design, 3E (Addison-Wesley, 2007), p. 109.
+
+* “FAVOR OBJECT COMPOSITION OVER CLASS INHERITANCE.”
+  * Even with single inheritance, this principle enhances flexibility, because subclassing is a form of tight coupling, and tall inheritance trees tend to be brittle.
+  * Composition and delegation can replace the use of mixins to make behaviors available to different classes, but cannot replace the use of interface inheritance to define a hierarchy of types.
+
+
+
+  
+
+
+
+
 
 
 
