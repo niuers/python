@@ -676,8 +676,58 @@ Note that when calling an instance method directly on a class, you must pass sel
 
 # Operator Overloading
 
-  
+## Some Rules
+* We cannot overload operators for the built-in types.
+* We cannot create new operators, only overload existing ones.
+* A few operators can’t be overloaded: `is`, `and`, `or`, `not` (but the bitwise &, |, ~, can).
+* Special methods implementing unary or infix operators should never change their operands. Expressions with such operators are expected to produce results by creating new objects. Only augmented assignment operators may change the first operand (self)
 
+
+## Unary Operators
+### - (__neg__)
+> Arithmetic unary negation. If x is -2 then -x == 2.
+
+### + (__pos__)
+> Arithmetic unary plus. Usually x == +x, but there are a few cases when that’s not true. See When x and +x Are Not Equal if you’re curious.
+
+* For +, returning a copy of self is the best approach most of the time.
+* Two cases in the standard library where `x != +x`
+  * The first case involves the `decimal.Decimal` class. You can have `x != +x` if `x` is a Decimal instance created in an arithmetic context and `+x` is then evaluated in a context with different settings. For example, `x` is calculated in a context with a certain precision, but the precision of the context is changed and then `+x` is evaluated.
+    * The fact is that each occurrence of the expression +one_third produces a new Decimal instance from the value of one_third, but using the precision of the current arithmetic context.
+ * The second case where x != +x you can find in the collections.Counter documentation. The Counter class implements several arithmetic operators, including infix + to add the tallies from two Counter instances. However, for practical reasons, Counter addition discards from the result any item with a negative or zero count. And the prefix + is a shortcut for adding an empty Counter, therefore it produces a new Counter preserving only the tallies that are greater than zero. 
+ 
+### ~ (__invert__)
+> Bitwise inverse of an integer, defined as ~x == -(x+1). If x is 2 then ~x == -3.
+
+## Operations Involving Objects of Different Types
+* To support operations involving objects of different types, Python implements a special dispatching mechanism for the infix operator special methods. Given an expression `a + b`, the interpreter will perform these steps:
+  * If `a` has `__add__`, call `a.__add__(b)` and return result unless it’s `NotImplemented`.
+  * If `a` doesn’t have `__add__`, or calling it returns NotImplemented, check if b has __radd__, then call b.__radd__(a) and return result unless it’s NotImplemented.
+  * If `b` doesn’t have __radd__, or calling it returns NotImplemented, raise TypeError with an unsupported operand types message.
+
+* The __radd__ method is called the “reflected” or “reversed” version of __add__. I prefer to call them “reversed” special methods.
+* Do not confuse NotImplemented with NotImplementedError. The first, NotImplemented, is a special singleton value that an infix operator special method should return to tell the interpreter it cannot handle a given operand. In contrast, NotImplementedError is an exception that stub methods in abstract classes raise to warn that they must be overwritten by subclasses.
+
+* If an infix operator method raises an exception, it aborts the operator dispatch algorithm. In the particular case of TypeError, it is often better to catch it and return NotImplemented. This allows the interpreter to try calling the reversed operator method, which may correctly handle the computation with the swapped operands, if they are of different types.
+
+## Rich Comparison Operators
+* The same set of methods are used in forward and reverse operator calls. For example, in the case of `==`, both the forward and reverse calls invoke `__eq__`, only swapping arguments; and a forward call to `__gt__` is followed by a reverse call to `__lt__` with the swapped arguments.
+* In the case of `==` and `!=`, if the reverse call fails, Python compares the object IDs instead of raising `TypeError`.
+* We don’t need to implement `!=` because the fallback behavior of the `__ne__` inherited from object suits us: when __eq__ is defined and does not return NotImplemented, __ne__ returns that result negated. A useful default __ne__ implementation is inherited from the object class, and it’s rarely necessary to override it.
+
+## Augmented Assignment Operators
+
+
+
+
+
+
+
+
+
+
+* In the spirit of duck typing, we will refrain from testing the type of the other operand, or the type of its elements.
+* A practical use of goose typing—an explicit check against an abstract type
 
 
 
