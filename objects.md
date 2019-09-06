@@ -709,6 +709,14 @@ Note that when calling an instance method directly on a class, you must pass sel
 * Do not confuse NotImplemented with NotImplementedError. The first, NotImplemented, is a special singleton value that an infix operator special method should return to tell the interpreter it cannot handle a given operand. In contrast, NotImplementedError is an exception that stub methods in abstract classes raise to warn that they must be overwritten by subclasses.
 
 * If an infix operator method raises an exception, it aborts the operator dispatch algorithm. In the particular case of TypeError, it is often better to catch it and return NotImplemented. This allows the interpreter to try calling the reversed operator method, which may correctly handle the computation with the swapped operands, if they are of different types.
+* To support operations with other types, we return the `NotImplemented` special value—not an exception—allowing the interpreter to try again by swapping the operands and calling the reverse special method for that operator (e.g., __radd__).
+
+### Mixing Operand Types
+* Mixing operand types means we need to detect when we get an operand we can’t handle. In this chapter, we did this in two ways: in the duck typing way, we just went ahead and tried the operation, catching a TypeError exception if it happened; later, in __mul__, we did it with an explicit isinstance test. There are pros and cons to these approaches: duck typing is more flexible, but explicit type checking is more predictable. When we did use isinstance, we were careful to avoid testing with a concrete class, but used the numbers.Real ABC: isinstance(scalar, numbers.Real). This is a good compromise between flexibility and safety, because existing or future user-defined types can be declared as actual or virtual subclasses of an ABC. 
+
+* In the spirit of duck typing, we will refrain from testing the type of the other operand, or the type of its elements.
+* A practical use of goose typing—an explicit check against an abstract type
+
 
 ## Rich Comparison Operators
 * The same set of methods are used in forward and reverse operator calls. For example, in the case of `==`, both the forward and reverse calls invoke `__eq__`, only swapping arguments; and a forward call to `__gt__` is followed by a reverse call to `__lt__` with the swapped arguments.
@@ -716,18 +724,30 @@ Note that when calling an instance method directly on a class, you must pass sel
 * We don’t need to implement `!=` because the fallback behavior of the `__ne__` inherited from object suits us: when __eq__ is defined and does not return NotImplemented, __ne__ returns that result negated. A useful default __ne__ implementation is inherited from the object class, and it’s rarely necessary to override it.
 
 ## Augmented Assignment Operators
+* We saw that Python handles them by default as a combination of plain operator followed by assignment, that is: a += b is evaluated exactly as a = a + b. That always creates a new object, so it works for mutable or immutable types. For mutable objects, we can implement in-place special methods such as __iadd__ for +=, and alter the value of the lefthand operand.
+
+* The in-place special methods should never be implemented for immutable types like our Vector class. This is fairly obvious, but worth stating anyway.
+* Operator `+` tends to be stricter than += regarding the types it accepts. For sequence types, + usually requires that both operands are of the same type, while += often accepts any iterable as the righthand operand.
+
+
+* Operator overloading is one area of Python programming where isinstance tests are common. In general, libraries should leverage dynamic typing—to be more flexible—by avoiding explicit type tests and just trying operations and then handling the exceptions, opening the door for working with objects regardless of their types, as long as they support the necessary operations. But Python ABCs allow a stricter form of duck typing, dubbed “goose typing” by Alex Martelli, which is often useful when writing code that overloads operators. 
+* A related technique is generic functions, supported by the @singledispatch decorator in Python 3
+* The functools.total_ordering function is a class decorator (supported in Python 2.7 and later) that automatically generates methods for all rich comparison operators in any class that defines at least a couple of them.
+
+### Java
+* James Gosling, quoted at the start of this chapter, made the conscious decision to leave operator overloading out when he designed Java. 
+* Having operator overloading in a high-level, easy-to-use language was probably a key reason for the amazing penetration of Python in scientific computing in recent years.
+* The much newer Go language followed the lead of Java in this regard and does not support operator overloading.
+
+
+### Reading
+* If you are curious about operator method dispatching in languages with dynamic typing, two seminal readings are “A Simple Technique for Handling Multiple Polymorphism” by Dan Ingalls (member of the original Smalltalk team) and “Arithmetic and Double Dispatching in Smalltalk-80” by Kurt J. Hebel and Ralph Johnson (Johnson became famous as one of the authors of the original Design Patterns book). Both papers provide deep insight into the power of polymorphism in languages with dynamic typing, like Smalltalk, Python, and Ruby. Python does not use double dispatching for handling operators as described in those articles. The Python algorithm using forward and reverse operators is easier for user-defined classes to support than double dispatching, but requires special handling by the interpreter. In contrast, classic double dispatching is a general technique you can use in Python or any OO language beyond the specific context of infix operators, and in fact Ingalls, Hebel, and Johnson use very different examples to describe it.
+
+The article “The C Family of Languages: Interview with Dennis Ritchie, Bjarne Stroustrup, and James Gosling” from which I quoted the epigraph in this chapter, and two other snippets in Soapbox, appeared in Java Report, 5(7), July 2000 and C++ Report, 12(7), July/August 2000. It’s an awesome reading if you are into programming language design.
 
 
 
 
-
-
-
-
-
-
-* In the spirit of duck typing, we will refrain from testing the type of the other operand, or the type of its elements.
-* A practical use of goose typing—an explicit check against an abstract type
 
 
 
