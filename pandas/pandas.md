@@ -7,6 +7,34 @@
 * [Frequently used options when using pandas](#frequently-used-options-when-using-pandas)
 * [Split Column of lists into multiple columns](#split-column-of-lists-into-multiple-columns)
 
+# Concepts
+## What is `pandas`?
+## Improve Performance
+* `mem_usage` and `convert_df`
+* Use index smartly
+* There are mainly two ways to access data, namely by indexing and by querying. Depending on the situation, you will rather go for one or another. However, Index (and MultiIndex) are, in most cases, the best choice. 
+* .loc[] / .iloc[] methods are performing really good when you want to read a data frame, but not to modify it. If you need to construct by hand (e.g. using loops), consider another data structure (e.g. dictionary, list) and then create your DataFrame once you have all the data ready. Otherwise, for every new row in your DataFrame, Pandas will update the index, which is not a simple hashmap.
+* Due to this, an unsorted index can reduce performances. In order to check if an index is sorted and to sort it, there are mainly two methods.
+  * 
+```            
+%%time
+>>> mi_df.sort_index()
+CPU times: user 34.8 ms, sys: 1.63 ms, total: 36.5 ms
+>>> mi_df.index.is_monotonic
+True
+```
+* itertuples() is much more efficient to iterate through the rows of a data frame.
+* join() uses merge()
+* UInt8 dtype supports NaN values with integers.
+* Remember that for now, any intensive I/O (e.g. flattening a big CSV dump) will perform much better with lower-level methods (use of Python core functions as much as possible).
+
+
+### Method Chaining
+* Method chaining
+Method chaining with DataFrame is an act of chaining multiple methods that return a DataFrame and therefore are methods from DataFrame class. In the current version of Pandas, the reason to use method chaining is to not store intermediate variables and to avoid the following situation:
+* The next method, pipe, is one of the most versatile. It allows to pipe operations — like in shell scripts — and perform even more operations with chains.
+
+
 ## Basic Data Structures
 ### np.array/np.ndarray
 
