@@ -87,6 +87,7 @@ def __mul__(self, scalar):
     else:
         return NotImplemented
 ```
+### Generators can also be used to produce values independent of a data source
 
 
 
