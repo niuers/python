@@ -1,7 +1,7 @@
 # Table of Contents
 
 * [Iterator Pattern](#iterator-pattern)
-* [](#)
+* [Generator Function](#generator-function)
 * [](#)
 * [](#)
 
@@ -69,7 +69,11 @@ iterator.  Don't check the type!  Use hasattr to check for both "__iter__" and "
 * A common cause of errors in building iterables and iterators is to confuse the two. To be clear: iterables have an __iter__ method that instantiates a new iterator every time. Iterators implement a __next__ method that returns individual items, and an __iter__ method that returns self. Therefore, iterators are also iterable, but iterables are not iterators.
 * An iterable should never act as an iterator over itself. In other words, iterables must implement __iter__, but not __next__.
 
-## Generator Function
+* iterator
+  * An object representing a stream of data. Repeated calls to the iterator’s __next__() method (or passing it to the built-in function next()) return successive items in the stream. When no more data are available a StopIteration exception is raised instead. At this point, the iterator object is exhausted and any further calls to its __next__() method just raise StopIteration again. Iterators are required to have an __iter__() method that returns the iterator object itself so every iterator is also iterable and may be used in most places where other iterables are accepted. One notable exception is code which attempts multiple iteration passes. A container object (such as a list) produces a fresh new iterator each time you pass it to the iter() function or use it in a for loop. Attempting this with an iterator will just return the same exhausted iterator object used in the previous iteration pass, making it appear like an empty container.
+
+
+# Generator Function
 * Definitions
   * generator: A function which returns a generator iterator. It looks like a normal function except that it contains yield expressions for producing a series of values usable in a for-loop or that can be retrieved one at a time with the next() function. Usually refers to a generator function, but may refer to a generator iterator in some contexts. In cases where the intended meaning isn’t clear, using the full terms avoids ambiguity.
   * generator iterator: An object created by a generator function. Each yield temporarily suspends processing, remembering the location execution state (including local variables and pending try-statements). When the generator iterator resumes, it picks up where it left off (in contrast to functions which start fresh on every invocation).
