@@ -1,9 +1,9 @@
 # Table of Contents
 
-*[Iterator Pattern](#iterator-pattern)
-*[](#)
-*[](#)
-*[](#)
+* [Iterator Pattern](#iterator-pattern)
+* [](#)
+* [](#)
+* [](#)
 
 
 
@@ -19,6 +19,11 @@
   * List, dict, and set comprehensions
   * Tuple unpacking
   * Unpacking actual parameters with * in function calls
+
+* The integration of the Iterator pattern in the semantics of Python is a prime example of how design patterns are not equally applicable in all programming languages.  
+  * In Python, a classic iterator implemented “by hand” has no practical use, except as a didactic example.
+
+
 
 # The `iter` function
 ## How does Iter function Work?
@@ -110,6 +115,66 @@ def __mul__(self, scalar):
 
 ### Iterable Reducing Functions (Folding, Accumulating, Reducing Functions)
 * Actually, every one of the built-ins listed here can be implemented with functools.reduce, but they exist as built-ins because they address some common use cases more easily. Also, in the case of all and any, there is an important optimization that can’t be done with reduce: these functions short-circuit (i.e., they stop consuming the iterator as soon as the result is determined).
+
+## Semantics of Generator Versus Iterator
+
+There are at least three ways of thinking about the relationship between iterators and generators.
+
+* The first is the interface viewpoint. The Python iterator protocol defines two methods: __next__ and __iter__. Generator objects implement both, so from this perspective, every generator is an iterator. By this definition, objects created by the enumerate() built-in are iterators:
+```
+>>> from collections import abc
+>>> e = enumerate('ABC')
+>>> isinstance(e, abc.Iterator)
+True
+```
+
+* The second is the implementation viewpoint. From this angle, a generator is a Python language construct that can be coded in two ways: as a function with the yield keyword or as a generator expression. The generator objects resulting from calling a generator function or evaluating a generator expression are instances of an internal GeneratorType. From this perspective, every generator is also an iterator, because GeneratorType instances implement the iterator interface. But you can write an iterator that is not a generator—by implementing the classic Iterator pattern, or by coding an extension in C. The enumerate objects are not generators from this perspective
+```
+>>> import types
+>>> e = enumerate('ABC')
+>>> isinstance(e, types.GeneratorType)
+False
+```
+  * This happens because types.GeneratorType is defined as “The type of generator-iterator objects, produced by calling a generator function.”
+
+* The third is the conceptual viewpoint. In the classic Iterator design pattern—as defined in the GoF book—the iterator traverses a collection and yields items from it. The iterator may be quite complex; for example, it may navigate through a tree-like data structure. But, however much logic is in a classic iterator, it always reads values from an existing data source, and when you call next(it), the iterator is not expected to change the item it gets from the source; it’s supposed to just yield it as is.
+  * In contrast, a generator may produce values without necessarily traversing a collection, like range does. And even if attached to a collection, generators are not limited to yielding just the items in it, but may yield some other values derived from them. A clear example of this is the enumerate function. By the original definition of the design pattern, the generator returned by enumerate is not an iterator because it creates the tuples it yields.
+  * At this conceptual level, the implementation technique is irrelevant. You can write a generator without using a Python generator object. Following is a Fibonacci generator I wrote just to make this point.
+```
+class Fibonacci:
+    def __iter__(self):
+        return FibonacciGenerator()
+class FibonacciGenerator:
+
+    def __init__(self):
+        self.a = 0
+        self.b = 1
+
+    def __next__(self):
+        result = self.a
+        self.a, self.b = self.b, self.a + self.b
+        return result
+
+    def __iter__(self):
+        return self
+
+#Here is the Pythonic Fibonacci generator:
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+```
+
+  * And of course, you can always use the generator language construct to perform the basic duties of an iterator: traversing a collection and yielding items from it.
+* In reality, Python programmers are not strict about this distinction: generators are also called iterators, even in the official docs. The canonical definition of an iterator in the Python Glossary is so general it encompasses both iterators and generators:
+  * Iterator: An object representing a stream of data. […]
+  * The full definition of [iterator](https://docs.python.org/3/glossary.html#term-iterator) in the Python Glossary is worth reading. On the other hand, the definition of [generator](https://docs.python.org/3/glossary.html#term-generator) there treats iterator and generator as synonyms, and uses the word “generator” to refer both to the generator function and the generator object it builds. So, in the Python community lingo, iterator and generator are fairly close synonyms.
+
+
+
+### Despite some similarities, generators and coroutines are basically two different concepts.
+
 
 ## Future Research
 * the numeric coercion rules are implicit in the arithmetic operator methods
