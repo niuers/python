@@ -70,6 +70,16 @@ iterator.  Don't check the type!  Use hasattr to check for both "__iter__" and "
 * An iterable should never act as an iterator over itself. In other words, iterables must implement __iter__, but not __next__.
 
 ## Generator Function
+* Definitions
+  * generator: A function which returns a generator iterator. It looks like a normal function except that it contains yield expressions for producing a series of values usable in a for-loop or that can be retrieved one at a time with the next() function. Usually refers to a generator function, but may refer to a generator iterator in some contexts. In cases where the intended meaning isn’t clear, using the full terms avoids ambiguity.
+  * generator iterator: An object created by a generator function. Each yield temporarily suspends processing, remembering the location execution state (including local variables and pending try-statements). When the generator iterator resumes, it picks up where it left off (in contrast to functions which start fresh on every invocation).
+  * generator expression: An expression that returns an iterator. It looks like a normal expression followed by a for clause defining a loop variable, range, and an optional if clause. The combined expression generates values for an enclosing function:
+```
+>>>
+>>> sum(i*i for i in range(10))         # sum of squares 0, 1, 4, ... 81
+285
+```
+
 * Any Python function that has the yield keyword in its body is a generator function: a function which, when called, returns a generator object. In other words, a generator function is a generator factory.
 * Generators are iterators that produce the values of the expressions passed to yield.
 * A generator function builds a generator object that wraps the body of the function. When we invoke next(…) on the generator object, execution advances to the next yield in the function body, and the next(…) call evaluates to the value yielded when the function body is suspended. Finally, when the function body returns, the enclosing generator object raises StopIteration, in accordance with the Iterator protocol.
