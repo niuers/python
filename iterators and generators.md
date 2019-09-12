@@ -33,6 +33,16 @@
 
 * The most accurate way to check whether an object x is iterable is to call iter(x) and handle a TypeError exception if it isn’t. This is more accurate than using isinstance(x, abc.Iterable), because iter(x) also considers the legacy __getitem__ method, while the Iterable ABC does not.
 
+* iter has another trick: it can be called with two arguments to create an iterator from a regular function or any callable object. In this usage, the first argument must be a callable to be invoked repeatedly (with no arguments) to yield values, and the second argument is a sentinel: a marker value which, when returned by the callable, causes the iterator to raise StopIteration instead of yielding the sentinel.
+  * the iter function here returns a callable_iterator
+  * A useful example is found in the iter built-in function documentation. This snippet reads lines from a file until a blank line is found or the end of file is reached:
+    ```
+    with open('mydata.txt') as fp:
+        for line in iter(fp.readline, ''):
+            process_line(line)
+    ```
+
+
 ## Iterables versus Iterators
 ### Iterable
 * Any object from which the iter built-in function can obtain an iterator. Objects implementing an `__iter__` method returning an iterator are iterable. Sequences are always iterable; as are objects implementing a `__getitem__` method that takes 0-based indexes.
@@ -88,7 +98,21 @@ def __mul__(self, scalar):
         return NotImplemented
 ```
 ### Generators can also be used to produce values independent of a data source
+* The classic Iterator pattern is all about traversal: navigating some data structure. But a standard interface based on a method to fetch the next item in a series is also useful when the items are produced on the fly, instead of retrieved from a collection. For example, the range built-in generates a bounded arithmetic progression (AP) of integers, and the itertools.count function generates a boundless AP.
+* There are plenty of ready-to-use generators in the standard library. For example, itertools. When implementing generators, know what is available in the standard library, otherwise there’s a good chance you’ll reinvent the wheel.
+* General-purpose functions that take arbitrary iterables as arguments and return generators that produce selected, computed, or rearranged items.
 
+### Combine Generators
+* A great feature of the functions in library: because they all take generators as arguments and return generators, they can be combined in many different ways.
+
+* `yield from` can also do generator combination
+  * Besides replacing a loop, yield from creates a channel connecting the inner generator directly to the client of the outer generator. This channel becomes really important when generators are used as coroutines and not only produce but also consume values from the client code. It is more than just syntatic sugar. 
+
+### Iterable Reducing Functions (Folding, Accumulating, Reducing Functions)
+* Actually, every one of the built-ins listed here can be implemented with functools.reduce, but they exist as built-ins because they address some common use cases more easily. Also, in the case of all and any, there is an important optimization that can’t be done with reduce: these functions short-circuit (i.e., they stop consuming the iterator as soon as the result is determined).
+
+## Future Research
+* the numeric coercion rules are implicit in the arithmetic operator methods
 
 
 
