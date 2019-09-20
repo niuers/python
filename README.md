@@ -81,8 +81,13 @@
 * IronPython is a Python implementation for the Microsoft-designed Common Language Runtime (CLR), most commonly known as .NET, written in C#.
 
 ### PyPy
-* PyPy is a fast and flexible implementation of Python, coded in a subset of Python itself, able to target several lower-level languages and virtual machines using advanced techniques such as type inferencing. PyPy’s greatest strength is its ability to generate native machine code “just in time” as it runs your Python program. 
-* PyPy has substantial advantages in speed and memory management, and is seeing production-level use.
+* PyPy is a fast and compliant alternative implementation of Python language, coded in a subset of Python itself, able to target several lower-level languages and virtual machines using advanced techniques such as type inferencing. PyPy’s greatest strength is its ability to generate native machine code “just in time” as it runs your Python program. 
+  * Speed: thanks to its Just-in-Time compiler, Python programs often run faster on PyPy. ([What is a JIT compiler?](https://en.wikipedia.org/wiki/Just-in-time_compilation))
+  * Memory usage: memory-hungry Python programs (several hundreds of MBs or more) might end up taking less space than they do in CPython.
+  * Compatibility: PyPy is highly compatible with existing python code. It supports cffi and can run popular python libraries like twisted and django.
+  * Stackless: PyPy comes by default with support for stackless mode, providing micro-threads for massive concurrency.
+
+
 
 ### Pyston
 * A new high-performance implementation in early development
