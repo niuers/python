@@ -5,7 +5,7 @@
     * [Characteristics](#characteristics)
     * [Two Futures](#two-futures)
   * [Blocking I/O and the GIL](#blocking-io-and-the-gil)
-  * [concurrent.futures](#concurrent-futures)
+  * [concurrent.futures](#concurrentfutures)
 * [Concurrency with asyncio](#concurrency-with-asyncio)
 
 
