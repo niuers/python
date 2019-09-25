@@ -43,6 +43,7 @@
 
 ## concurrent.futures
 * The main features of the `concurrent.futures` package are the `ThreadPoolExecutor` and `ProcessPoolExecutor` classes, which implement an interface that allows you to submit callables for execution in different threads or processes, respectively. The classes manage an internal pool of worker threads or processes, and a queue of tasks to be executed. 
+* concurrent.futures package is exciting: it treats threads, processes, and queues as infrastructure at your service, not something you have to deal with directly. Of course, it’s designed with simple jobs in mind, the so-called [“embarrassingly parallel”](https://en.wikipedia.org/wiki/Embarrassingly_parallel) problems.
 
 ### Launching Threads with `concurrent.futures`
 * Python threads are well suited for I/O-bound applications, despite the GIL: every standard library I/O function written in C releases the GIL, so while a given thread is waiting for I/O, the Python scheduler can switch to another thread.
@@ -92,8 +93,23 @@
 * For CPU-bound work, you need to sidestep the GIL by launching multiple processes. 
   * The `futures.ProcessPoolExecutor` is the easiest way to do it. But again, if your use case is complex, you’ll need more advanced tools. The `multiprocessing` package emulates the threading API but delegates jobs to multiple processes. For simple programs, multiprocessing can replace threading with few changes. But multiprocessing also offers facilities to solve the biggest challenge faced by collaborating processes: how to pass around data.
   
+## Other Languages
+* Go, Elixir, and Clojure provide better, higher-level, concurrency abstractions, as the Seven Concurrency Models book demonstrates. Erlang—the implementation language of Elixir—is a prime example of a language designed from the ground up with concurrency in mind.
+* Like Lisp and Clojure, Elixir implements syntactic macros. That’s a double-edged sword. Syntactic macros enable powerful DSLs, but the proliferation of sublanguages can lead to incompatible codebases and community fragmentation. Lisp drowned in a flood of macros, with each Lisp shop using its own arcane dialect. Standardizing around Common Lisp resulted in a bloated language. I hope José Valim can inspire the Elixir community to avoid a similar outcome.
+
+* Go is a modern language with fresh ideas. But, in some regards, it’s a conservative language, compared to Elixir. Go doesn’t have macros, and its syntax is simpler than Python’s. Go doesn’t support inheritance or operator overloading, and it offers fewer opportunities for metaprogramming than Python. These limitations are considered features. They lead to more predictable behavior and performance. That’s a big plus in the highly concurrent, mission-critical settings where Go aims to replace C++, Java, and Python.
+* But in the history of programming languages, the conservative ones tend to attract more coders. I’d like to become fluent in Go and Elixir.
+
+* Concurrency in the Competition
+  * MRI—the reference implementation of Ruby—also has a GIL, so its threads are under the same limitations as Python’s. Meanwhile, JavaScript interpreters don’t support user-level threads at all; asynchronous programming with callbacks is their only path to concurrency.
+
+
+
 ## Future Reading
-* 
+* For a modern take on concurrency without threads or callbacks, Seven Concurrency Models in Seven Weeks, by Paul Butcher (Pragmatic Bookshelf) is an excellent read. 
+* If you are intrigued about the GIL, start with the Python Library and Extension FAQ ([“Can’t we get rid of the Global Interpreter Lock?”](https://docs.python.org/3/faq/library.html#id18)). Also worth reading are posts by Guido van Rossum and Jesse Noller (contributor of the multiprocessing package): “[It isn’t Easy to Remove the GIL](https://www.artima.com/weblogs/viewpost.jsp?thread=214235)” and “Python Threads and the Global Interpreter Lock.” Finally, David Beazley has a detailed exploration on the inner workings of the GIL: “[Understanding the Python GIL.](http://www.dabeaz.com/GIL/)” In [slide #54](http://www.dabeaz.com/python/UnderstandingGIL.pdf) of the presentation, Beazley reports some alarming results, including a 20× increase in processing time for a particular benchmark with the new GIL algorithm introduced in Python 3.2. However, Beazley apparently used an empty while True: pass to simulate CPU-bound work, and that is not realistic. The issue is not significant with real workloads, according to a comment by Antoine Pitrou—who implemented the new GIL algorithm—in the bug report submitted by Beazley.
+
+
 
 
 
