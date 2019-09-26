@@ -130,6 +130,37 @@
   * With coroutines, everything is protected against interruption by default. You must explicitly yield to let the rest of the program run. Instead of holding locks to synchronize the operations of multiple threads, you have coroutines that are “synchronized” by definition: only one of them is running at any time. And when you want to give up control, you use yield or yield from to give control back to the scheduler. That’s why it is possible to safely cancel a coroutine: by definition, a coroutine can only be cancelled when it’s suspended at a yield point, so you can perform cleanup by handling the CancelledError exception.
 
 ### asyncio.Future: Nonblocking by Design
+* The asyncio.Future and the concurrent.futures.Future classes have mostly the same interface, but are implemented differently and are not interchangeable.
+* `futures` are created only as the result of scheduling something for execution. 
+* In asyncio, BaseEventLoop.create_task(…) takes a coroutine, schedules it to run, and returns an asyncio.Task instance—which is also an instance of asyncio.Future because Task is a subclass of Future designed to wrap a coroutine. This is analogous to how we create concurrent.futures.Future instances by invoking Executor.submit(…).
+* Using yield from with a future automatically takes care of waiting for it to finish, without blocking the event loop—because in asyncio, yield from is used to give control back to the event loop.
+
+* Note that using yield from with a future is the coroutine equivalent of the functionality offered by add_done_callback: instead of triggering a callback, when the delayed operation is done, the event loop sets the result of the future, and the yield from expression produces a return value inside our suspended coroutine, allowing it to resume.
+
+* In summary, because asyncio.Future is designed to work with yield from, these methods are often not needed:
+  * You don’t need my_future.add_done_callback(…) because you can simply put whatever processing you would do after the future is done in the lines that follow yield from my_future in your coroutine. That’s the big advantage of having coroutines: functions that can be suspended and resumed.
+  * You don’t need my_future.result() because the value of a yield from expression on a future is the result (e.g., result = yield from my_future).
+
+### Yielding from Futures, Tasks, and Coroutines
+* In asyncio, there is a close relationship between futures and coroutines because you can get the result of an asyncio.Future by yielding from it. This means that res = yield from foo() works if foo is a coroutine function (therefore it returns a coroutine object when called) or if foo is a plain function that returns a Future or Task instance. This is one of the reasons why coroutines and futures are interchangeable in many parts of the asyncio API.
+
+* In order to execute, a coroutine must be scheduled, and then it’s wrapped in an asyncio.Task.
+
+* If you want to experiment with futures and coroutines on the Python console or in small tests, you can use the following snippet:3
+```
+>>> import asyncio
+>>> def run_sync(coro_or_future):
+...     loop = asyncio.get_event_loop()
+...     return loop.run_until_complete(coro_or_future)
+...
+>>> a = run_sync(some_coroutine())
+```
+* The relationship between coroutines, futures, and tasks is documented in section 18.5.3. Tasks and coroutines of the asyncio documentation, where you’ll find this note:
+
+In this documentation, some methods are documented as coroutines, even if they are plain Python functions returning a Future. This is intentional to have a freedom of tweaking the implementation of these functions in the future.
+
+
+
 
 
   
