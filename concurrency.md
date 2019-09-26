@@ -29,17 +29,17 @@
   * The asyncio.Future.result method does not support timeout, and the preferred way to get the result of futures in that library is to use yield from—which doesn’t work with concurrency.futures.Future instances.
   
 ## Blocking I/O and the GIL
-* The concurrent.futures examples are limited by the GIL.
+* The `concurrent.futures` examples are limited by the GIL.
 * The GIL is nearly harmless with I/O-bound processing.
-* The CPython interpreter is not thread-safe internally, so it has a Global Interpreter Lock (GIL), which allows only one thread at a time to execute Python bytecodes. That’s why a single Python process usually cannot use multiple CPU cores at the same time.
+  * The CPython interpreter is not thread-safe internally, so it has a Global Interpreter Lock (GIL), which allows only one thread at a time to execute Python bytecodes. That’s why a single Python process usually cannot use multiple CPU cores at the same time.
   * This is a limitation of the CPython interpreter, not of the Python language itself. Jython and IronPython are not limited in this way; but Pypy, the fastest Python interpreter available, also has a GIL.
-
-* When we write Python code, we have no control over the GIL, but a built-in function or an extension written in C can release the GIL while running time-consuming tasks. In fact, a Python library coded in C can manage the GIL, launch its own OS threads, and take advantage of all available CPU cores. This complicates the code of the library considerably, and **most library authors don’t do it**.
-  * `sleep` always releases the GIL.
-* However, all standard library functions that perform blocking I/O release the GIL when waiting for a result from the OS. This means Python programs that are I/O bound can benefit from using threads at the Python level: while one Python thread is waiting for a response from the network, the blocked I/O function releases the GIL so another thread can run. The time.sleep() function also releases the GIL.
-* That’s why David Beazley says: “Python threads are great at doing nothing.”
-* Therefore, Python threads are perfectly usable in I/O-bound applications, despite the GIL.
-* Python threads are well suited for I/O-intensive applications, and the concurrent.futures package makes them trivially simple to use for certain use cases.
+  * When we write Python code, we have no control over the GIL, but a built-in function or an extension written in C can release the GIL while running time-consuming tasks. In fact, a Python library coded in C can manage the GIL, launch its own OS threads, and take advantage of all available CPU cores. This complicates the code of the library considerably, and **most library authors don’t do it**.
+  * However, all standard library functions that perform blocking I/O release the GIL when waiting for a result from the OS. 
+    * This means Python programs that are I/O bound can benefit from using threads at the Python level: while one Python thread is waiting (blocked) for a response from the network, the blocked I/O function releases the GIL so another thread can run. 
+    * The `time.sleep()` function always releases the GIL.
+  * That’s why David Beazley says: “Python threads are great at doing nothing.”
+  * Therefore, Python threads are perfectly usable in I/O-bound applications, despite the GIL.
+  * Python threads are well suited for I/O-intensive applications, and the concurrent.futures package makes them trivially simple to use for certain use cases.
 
 ## concurrent.futures
 * The main features of the `concurrent.futures` package are the `ThreadPoolExecutor` and `ProcessPoolExecutor` classes, which implement an interface that allows you to submit callables for execution in different threads or processes, respectively. The classes manage an internal pool of worker threads or processes, and a queue of tasks to be executed. 
@@ -104,6 +104,38 @@
   * MRI—the reference implementation of Ruby—also has a GIL, so its threads are under the same limitations as Python’s. Meanwhile, JavaScript interpreters don’t support user-level threads at all; asynchronous programming with callbacks is their only path to concurrency.
 
 # Concurrency with asyncio
+
+## Concurrency vs. Parallelism
+* Concurrency is about dealing with lots of things at once. Parallelism is about doing lots of things at once. Not the same, but related. One is about structure, one is about execution. 
+* Concurrency provides a way to structure a solution to solve a problem that may (but not necessarily) be parallelizable. By Rob Pike, Co-inventor of the Go language, "Concurrency Is Not Parallelism (It’s Better)”.
+* For real parallelism, you must have multiple cores. A modern laptop has four CPU cores but is routinely running more than 100 processes at any given time under normal, casual use. So, in practice, most processing happens concurrently and not in parallel. The computer is constantly dealing with 100+ processes, making sure each has an opportunity to make progress, even if the CPU itself can’t do more than four things at once. Ten years ago we used machines that were also able to handle 100 processes concurrently, but on a single core. That’s why Rob Pike titled that talk “Concurrency Is Not Parallelism (It’s Better).”
+
+## Thread Versus Coroutine: A Comparison
+
+
+## asyncio
+* `asyncio` is a package that implements concurrency with coroutines driven by an event loop. 
+* `asyncio` uses a stricter definition of “coroutine.” 
+  * A coroutine suitable for use with the asyncio API must use `yield from` and not `yield` in its body. 
+  * Also, an `asyncio` coroutine should be driven by a caller invoking it through `yield from` or by passing the coroutine to one of the asyncio functions such as `asyncio.async(…)` and others. 
+  * Finally, the `@asyncio.coroutine` decorator should be applied to coroutines
+  
+* Never use time.sleep(…) in asyncio coroutines unless you want to block the main thread, therefore freezing the event loop and probably the whole application as well. If a coroutine needs to spend some time doing nothing, it should yield from asyncio.sleep(DELAY).
+
+* An asyncio.Task is roughly the equivalent of a threading.Thread. Victor Stinner, special technical reviewer for this chapter, points out that “a Task is like a green thread in libraries that implement cooperative multitasking, such as gevent.”
+  * A Task drives a coroutine, and a Thread invokes a callable.
+  * When you get a Task object, it is already scheduled to run (e.g., by asyncio.async); a Thread instance must be explicitly told to run by calling its start method.
+  * There’s no API to terminate a thread from the outside, because a thread could be interrupted at any point, leaving the system in an invalid state. For tasks, there is the Task.cancel() instance method, which raises CancelledError inside the coroutine. The coroutine can deal with this by catching the exception in the yield where it’s suspended.
+  * you know how challenging it is to reason about the program because the scheduler can interrupt a thread at any time. You must remember to hold locks to protect the critical sections of your program, to avoid getting interrupted in the middle of a multistep operation—which could leave data in an invalid state.
+  * With coroutines, everything is protected against interruption by default. You must explicitly yield to let the rest of the program run. Instead of holding locks to synchronize the operations of multiple threads, you have coroutines that are “synchronized” by definition: only one of them is running at any time. And when you want to give up control, you use yield or yield from to give control back to the scheduler. That’s why it is possible to safely cancel a coroutine: by definition, a coroutine can only be cancelled when it’s suspended at a yield point, so you can perform cleanup by handling the CancelledError exception.
+
+### asyncio.Future: Nonblocking by Design
+
+
+  
+
+
+
 
 
 ## Future Reading
