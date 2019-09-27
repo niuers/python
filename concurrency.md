@@ -159,6 +159,37 @@
 
 In this documentation, some methods are documented as coroutines, even if they are plain Python functions returning a Future. This is intentional to have a freedom of tweaking the implementation of these functions in the future.
 
+### How to Understand the `yield from` code
+* It is easy to follow the code with `yield from` if you employ a trick suggested by Guido van Rossum himself: squint and pretend the `yield from` keywords are not there. If you do that, you’ll notice that the code is as easy to read as plain old sequential code.
+* Using the yield from foo syntax avoids blocking because the current coroutine is suspended (i.e., the delegating generator where the yield from code is), but the control flow goes back to the event loop, which can drive other coroutines. When the foo future or coroutine is done, it returns a result to the suspended coroutine, resuming it.
+
+### The facts about every usage of yield from
+* Every arrangement of coroutines chained with `yield from` must be ultimately driven by a caller that is not a coroutine, which invokes `next(…)` or `.send(…)` on the outermost delegating generator, explicitly or implicitly (e.g., in a for loop).
+* The innermost subgenerator in the chain must be a simple generator that uses just yield—or an iterable object.
+
+* When using yield from with the `asyncio` API, both facts remain true, with the following specifics:
+  * The coroutine chains we write are always driven by passing our outermost delegating generator to an asyncio API call, such as `loop.run_until_complete(…)`.
+  * In other words, when using `asyncio` our code doesn’t drive a coroutine chain by calling `next(…)` or `.send(…)` on it—the asyncio event loop does that.
+  * The coroutine chains we write always end by delegating with `yield from` to some asyncio coroutine function or coroutine method (e.g., `yield from asyncio.sleep(…)`) or coroutines from libraries that implement higher-level protocols (e.g., `resp = yield from aiohttp.request('GET', url)` ).
+  * In other words, the innermost subgenerator will be a library function that does the actual I/O, not something we write.
+
+* To summarize: as we use `asyncio`, our asynchronous code consists of coroutines that are delegating generators driven by asyncio itself and that ultimately delegate to asyncio library coroutines—possibly by way of some third-party library such as `aiohttp`. This arrangement creates pipelines where the `asyncio` event loop drives—through our coroutines—the library functions that perform the low-level asynchronous I/O.
+
+### Running Circles Around Blocking Calls
+* There are two ways to prevent blocking calls to halt the progress of the entire application:
+  * Run each blocking operation in a separate thread.
+    * Threads work fine, but the memory overhead for each OS thread—**the kind that Python uses**—is on the order of megabytes, depending on the OS. We can’t afford one thread per connection if we are handling thousands of connections.
+  * Turn every blocking operation into a nonblocking asynchronous call.
+    * Callbacks are the traditional way to implement asynchronous calls with low memory overhead. They are a low-level concept, similar to the oldest and most primitive concurrency mechanism of all: hardware interrupts. Instead of waiting for a response, we register a function to be called when something happens. In this way, every call we make can be nonblocking. Ryan Dahl advocates callbacks for their simplicity and low overhead.
+    * Of course, we can only make callbacks work because the event loop underlying our asynchronous applications can rely on infrastructure that uses interrupts, threads, polling, background processes, etc. to ensure that multiple concurrent requests make progress and they eventually get done. When the event loop gets a response, it calls back our code. But the single main thread shared by the event loop and our application code is never blocked—if we don’t make mistakes.
+    * When used as coroutines, generators provide an alternative way to do asynchronous programming. From the perspective of the event loop, invoking a callback or calling .send() on a suspended coroutine is pretty much the same. There is a memory overhead for each suspended coroutine, but it’s orders of magnitude smaller than the overhead for each thread. And they avoid the dreaded “callback hell,” which we’ll discuss in “From Callbacks to Futures and Coroutines”.
+
+
+
+
+
+
+
 
 
 
