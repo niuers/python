@@ -594,12 +594,11 @@ True
 
 
 # Inheritance
-* Java doesn't have multiple inheritance, but Java supports multiple inheritance of interfaces. Except that Java interfaces cannot have state—a key distinction.
-* Scala implements traits. Other languages supporting traits are the latest stable versions of PHP and Groovy, and the under-construction languages Rust and Perl 6—so it’s fair to say that traits are trendy as I write this.
-* Ruby offers an original take on multiple inheritance: it does not support it, but introduces mixins as a language feature. A Ruby class can include a module in its body, so the methods defined in the module become part of the class implementation. This is a “pure” form of mixin, with no inheritance involved, and it’s clear that a Ruby mixin has no influence on the type of the class where it’s used. This provides the benefits of mixins, while avoiding many of its usual problems.
-* Go has no inheritance at all, but it implements interfaces in a way that resembles a static form of duck typing (see Soapbox for more about this). Julia avoids the terms “classes” and has only “types.” 
-* Julia has a type hierarchy but subtypes cannot inherit structure, only behaviors, and only abstract types can be subtyped. In addition, Julia methods are implemented using multiple dispatch
-
+* Java doesn't have **multiple inheritance**, but Java supports **multiple inheritance of interfaces**. Except that Java interfaces cannot have state—a key distinction.
+* Scala implements **traits**, so are the latest PHP and Groovy, and the under-construction languages Rust and Perl 6—so it’s fair to say that traits are trendy.
+* Ruby offers an original take on multiple inheritance: it does not support it, but introduces **mixins** as a language feature. A Ruby class can include a module in its body, so the methods defined in the module become part of the class implementation. This is a “pure” form of mixin, with no inheritance involved, and it’s clear that a Ruby mixin has no influence on the type of the class where it’s used. This provides the benefits of mixins, while avoiding many of its usual problems.
+* Go has no inheritance at all, but it implements interfaces in a way that resembles a static form of duck typing. Julia avoids the terms “classes” and has only “types”.
+* Julia has a type hierarchy but subtypes cannot inherit structure, only behaviors, and only abstract types can be subtyped. In addition, Julia methods are implemented using multiple dispatch.
 
 ## Subclassing Built-In Types Is Tricky
 * The code of the built-ins (written in C) does not call special methods overridden by user-defined classes.
@@ -634,34 +633,39 @@ Note that when calling an instance method directly on a class, you must pass sel
 * MAKE INTERFACES EXPLICIT WITH ABCS
   * In modern Python, if a class is designed to define an interface, it should be an explicit ABC. In Python ≥ 3.4, this means: subclass abc.ABC or another ABC.
 
-* USE MIXINS FOR CODE REUSE
-  * If a class is designed to provide method implementations for reuse by multiple unrelated subclasses, without implying an “is-a” relationship, it should be an explicit mixin class. Conceptually, a mixin does not define a new type; it merely bundles methods for reuse. A mixin should never be instantiated, and concrete classes should not inherit only from a mixin. Each mixin should provide a single specific behavior, implementing few and very closely related methods.
-  * Mixins are a sort of class that is used to "mix in" extra properties and methods into a class. This allows you to create classes in a compositional style.
-  * However, in Python the class hierarchy is defined right to left, so in this case the Mixin2 class is the base class, extended by Mixin1 and finally by BaseClass. This is usually fine because many times the mixin classes don't override each other's, or the base class' methods. But if you do override methods or properties in your mixins this can lead to unexpected results because the priority of how methods are resolved is from left to right.
+#### USE MIXINS FOR CODE REUSE
+* If a class is designed to provide method implementations for reuse by multiple unrelated subclasses, without implying an “is-a” relationship, it should be an explicit mixin class.
+* Conceptually, a mixin does not define a new type; it merely bundles methods for reuse. 
+* A mixin should never be instantiated, and concrete classes should not inherit only from a mixin. 
+* Each mixin should provide a single specific behavior, implementing few and very closely related methods.
+* Mixins are a sort of class that is used to "mix in" extra properties and methods into a class. This allows you to create classes in a compositional style.
+* In Python *the class hierarchy is defined right to left*, so in the following example, the `Mixin2` class is the base class, extended by `Mixin1` and finally by `BaseClass`. 
+  * This is usually fine because many times the mixin classes don't override each other's, or the base class' methods. But if you do override methods or properties in your mixins this can lead to unexpected results because the priority of **how methods are resolved is from left to right**.
 
   ```
   class MyClass(BaseClass, Mixin1, Mixin2):
     pass
   ```
 
-* MAKE MIXINS EXPLICIT BY NAMING
+* MAKE MIXINS EXPLICIT BY NAMING, e.g. `TransformerMixin`.
 * AN ABC MAY ALSO BE A MIXIN; THE REVERSE IS NOT TRUE
-  * Because an ABC can implement concrete methods, it works as a mixin as well. An ABC also defines a type, which a mixin does not. And an ABC can be the sole base class of any other class, while a mixin should never be subclassed alone except by another, more specialized mixin—not a common arrangement in real code.
-
+  * Because an ABC can implement concrete methods, it works as a mixin as well. 
+  * An ABC also defines a type, which a mixin does not. 
+  * And an ABC can be the sole base class of any other class, while a mixin should never be subclassed alone except by another, more specialized mixin—not a common arrangement in real code.
   * One restriction applies to ABCs and not to mixins: the concrete methods implemented in an ABC should only collaborate with methods of the same ABC and its superclasses. This implies that concrete methods in an ABC are always for convenience, because everything they do, a user of the class can also do by calling other methods of the ABC.
 
 * DON’T SUBCLASS FROM MORE THAN ONE CONCRETE CLASS
- * Concrete classes should have zero or at most one concrete superclass.[93] In other words, all but one of the superclasses of a concrete class should be ABCs or mixins.
+ * Concrete classes should have zero or at most one concrete superclass. In other words, all but one of the superclasses of a concrete class should be ABCs or mixins.
  * Scott Meyer’s More Effective C++, which goes even further: “all non-leaf classes should be abstract” (i.e., concrete classes should not have concrete superclasses at all).
 
 * PROVIDE AGGREGATE CLASSES TO USERS
-  * If some combination of ABCs or mixins is particularly useful to client code, provide a class that brings them together in a sensible way. Grady Booch calls this an aggregate class.
+  * If some combination of ABCs or mixins is particularly useful to client code, provide a class that brings them together in a sensible way. Grady Booch calls this an **aggregate class**.
   * “A class that is constructed primarily by inheriting from mixins and does not add its own structure or behavior is called an aggregate class.”, Grady Booch et al., Object Oriented Analysis and Design, 3E (Addison-Wesley, 2007), p. 109.
   * Aggregate classes normally don't have its methods.
 
-* “FAVOR OBJECT COMPOSITION OVER CLASS INHERITANCE.”
-  * Even with single inheritance, this principle enhances flexibility, because subclassing is a form of tight coupling, and tall inheritance trees tend to be brittle.
-  * Composition and delegation can replace the use of mixins to make behaviors available to different classes, but cannot replace the use of interface inheritance to define a hierarchy of types.
+#### FAVOR OBJECT COMPOSITION OVER CLASS INHERITANCE
+* Even with single inheritance, this principle enhances flexibility, because subclassing is a form of tight coupling, and tall inheritance trees tend to be brittle.
+* Composition and delegation can replace the use of mixins to make behaviors available to different classes, but cannot replace the use of interface inheritance to define a hierarchy of types.
 
 * If, while working as an application developer, you find yourself building multilevel class hierarchies, it’s likely that one or more of the following applies:
   * You are reinventing the wheel. Go look for a framework or library that provides components you can reuse in your application.
