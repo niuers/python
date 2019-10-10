@@ -1,25 +1,25 @@
 # Table of Contents
 
-* [](#)
+* [Context Managers and with Blocks](#context-managers-and-with-blocks)
 * [](#)
 
 
 # Context Managers and with Blocks
-* The with statement sets up a temporary context and reliably tears it down, under the control of a context manager object. This prevents errors and reduces boilerplate code, making APIs at the same time safer and easier to use.
-* Context manager objects exist to control a with statement, just like iterators exist to control a for statement.
-* The with statement was designed to simplify the `try/finally` pattern, which guarantees that some operation is performed after a block of code, even if the block is aborted because of an exception, a return or `sys.exit()` call. The code in the finally clause usually releases a critical resource or restores some previous state that was temporarily changed.
+* The `with` statement sets up a temporary context and reliably tears it down, under the control of a context manager object. This prevents errors and reduces boilerplate code, making APIs at the same time safer and easier to use.
+* Context manager objects exist to control a `with` statement, just like iterators exist to control a `for` statement.
+* The `with` statement was designed to simplify the `try/finally` pattern, which guarantees that some operation is performed after a block of code, even if the block is aborted because of an exception, a return or `sys.exit()` call. The code in the `finally` clause usually releases a critical resource or restores some previous state that was temporarily changed.
 * The context manager protocol consists of the `__enter__` and `__exit__` methods. At the start of the `with`, `__enter__` is invoked on the context manager object. The role of the `finally` clause is played by a call to `__exit__` on the context manager object at the end of the `with` block.
 * The most common example is making sure a file object is closed.
 * However, `with` blocks don’t define a new scope, as functions and modules do. So after a `with` statement, the variable is still available, e.g. a file.
 * The context manager object is the result of evaluating the expression after `with`, but the value bound to the target variable (in the `as` clause) is the result of calling `__enter__` on the context manager object (i.e. returned from `__enter__`).
 * When control flow exits the `with` block in any way, the `__exit__` method is invoked on the context manager object, not on whatever is returned by `__enter__`.
 
-## On __exit__
-* The interpreter calls the __enter__ method with no arguments—beyond the implicit self. The three arguments passed to __exit__ are:
+## On `__exit__`
+* The interpreter calls the `__enter__` method with no arguments—beyond the implicit self. The three arguments passed to `__exit__` are:
   * exc_type
   * exc_value
   * traceback
-* The three arguments received by self are exactly what you get if you call sys.exc_info() in the finally block of a try/finally statement. This makes sense, considering that the with statement is meant to replace most uses of try/finally, and calling sys.exc_info() was often necessary to determine what clean-up action would be required.
+* The three arguments received by `self` are exactly what you get if you call `sys.exc_info()` in the finally block of a `try/finally` statement. This makes sense, considering that the with statement is meant to replace most uses of try/finally, and calling `sys.exc_info()` was often necessary to determine what clean-up action would be required.
 
 ## Using @contextmanager
 * @contextmanager decorator is also intriguing because it shows a use for the yield statement unrelated to iteration.
@@ -32,10 +32,6 @@
 * Note that the use of yield in a generator used with the @contextmanager decorator has nothing to do with iteration. In the examples shown in this section, the generator function is operating more like a coroutine: a procedure that runs up to a point, then suspends to let the client code run until the client wants the coroutine to proceed with its job.
 
 * A key point that Raymond Hettinger made in his PyCon US 2013 keynote is that with is not just for resource management, but it’s a tool for factoring out common setup and teardown code, or any pair of operations that need to be done before and after another procedure (slide 21, What Makes Python Awesome?).
-
-
-  
-
 
 
 # `else` Blocks
