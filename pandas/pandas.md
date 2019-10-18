@@ -278,11 +278,13 @@ df_count = df.groupby(pd.cut(df["abs_score"], np.arange(0, 11,1))).apply(f)
 
 ## Frequently used options when using pandas
 ```python
-pd.set_option('max_rows', 7)
-pd.reset_option('max_rows')
+pd.set_option('display.max_colwidth', -1) # don't truncate columns
 ```
 ### Display rows for a DataFrame
 ```
+pd.set_option('max_rows', 7)
+pd.set_option('max_rows', -1) #display all rows
+pd.reset_option('max_rows')
 pd.set_option('display.max_rows', 1000)
 display(df)
 ```
