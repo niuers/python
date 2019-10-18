@@ -250,6 +250,29 @@ df[['new_col1', 'new_col2']] = pd.DataFrame({'A':[1,2,3], 'B':[4,5,6]})
 df[['new_col1', 'new_col2']] = pd.DataFrame([[1,4], [2,5], [3,6]])
 
 ```
+## GroupBy
+### Split the data into groups based on the values of a column and count
+
+```
+# Raw Data
+        score  y    margin  is_correct  abs_score
+54  -9.443710 -1  9.443710           1   9.443710
+443 -9.172599 -1  9.172599           1   9.172599
+346 -9.130376 -1  9.130376           1   9.130376
+330 -7.926672 -1  7.926672           1   7.926672
+67   7.311857  1  7.311857           1   7.311857
+```
+
+```
+def f(x):
+    d = {}
+    d['correct_sum'] = x['is_correct'].sum()
+    d['total_num'] = x['is_correct'].count()
+    d['error_pct'] = d['correct_sum']/d['total_num'] if d['total_num'] > 0 else 0
+    return pd.Series(d, index=['correct_sum', 'total_num', 'error_pct'])
+
+df_count = df.groupby(pd.cut(df["abs_score"], np.arange(0, 11,1))).apply(f)
+```
 
 
 
