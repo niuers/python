@@ -3,6 +3,9 @@
 * [](#)
 * [](#)
 
+1. What is numpy broadcasting?
+1. Why numpy vectorization is very efficient?
+
 # Numpy Broadcasting
 
 * The term broadcasting describes how numpy treats arrays with different shapes during arithmetic operations.
